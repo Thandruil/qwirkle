@@ -25,8 +25,7 @@ public class Deck {
     private ArrayList<Tile> tiles;
 
     /**
-     * Constructor. Creates a new Deck which is filled with all
-     * possible tiles combinations, three times.
+     * Creates a new Deck which is filled with all possible tiles combinations, three times.
      */
     public Deck() {
         this.tiles = new ArrayList<>(SIZE);
