@@ -5,16 +5,16 @@ public interface IProtocol {
     String CLIENT_CONNECT = "CONNECT";
     String CLIENT_QUIT = "QUIT";
     String CLIENT_QUEUE = "QUEUE";
-    String CLIENT_MOVE_PUT = "MOVE PUT";
-    String CLIENT_MOVE_TRADE = "MOVE TRADE";
+    String CLIENT_MOVE_PUT = "MOVE_PUT";
+    String CLIENT_MOVE_TRADE = "MOVE_TRADE";
 
     String SERVER_CONNECT = "CONNECTOK";
     String SERVER_GAMESTART = "GAMESTART";
     String SERVER_GAMEEND = "GAMEEND";
     String SERVER_TURN = "TURN";
     String SERVER_DRAWTILE = "DRAWTILE";
-    String SERVER_MOVE_PUT = "MOVEOK PUT";
-    String SERVER_MOVE_TRADE = "MOVEOK TRADE";
+    String SERVER_MOVE_PUT = "MOVEOK_PUT";
+    String SERVER_MOVE_TRADE = "MOVEOK_TRADE";
     String SERVER_ERROR = "ERROR";
 
     /* Chat */
