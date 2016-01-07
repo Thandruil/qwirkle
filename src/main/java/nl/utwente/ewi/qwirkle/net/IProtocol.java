@@ -23,8 +23,8 @@ public interface IProtocol {
 
     /* Challenge */
     String CLIENT_CHALLENGE = "CHALLENGE";
-    String CLIENT_CHALLENGE_ACCEPT = "CACCEPT";
-    String CLIENT_CHALLENGE_DECLINE = "CDECLINE";
+    String CLIENT_CHALLENGE_ACCEPT = "CHALLENGE_ACCEPT";
+    String CLIENT_CHALLENGE_DECLINE = "CHALLENGE_DECLINE";
     String SERVER_CHALLENGE = "CHALLENGEOK";
 
     /* Leaderboard */
