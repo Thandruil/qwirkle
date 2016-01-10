@@ -5,6 +5,8 @@ package nl.utwente.ewi.qwirkle.net;
  * contains definitions for all commands used in the protocol. An implementation has
  * to be made by the groups themselves.
  *
+ *
+ *
  * @author Erik Gaal
  * @version 0.1
  * @since 0.1-w01
@@ -19,9 +21,22 @@ public interface IProtocol {
     }
 
     /**
+     * <p>Enumeration of the error codes.</p>
+     */
+    enum Error {
+        COMMAND_NOT_FOUND, INVALID_PARAMETER,
+        NAME_INVALID, NAME_USED,
+        QUEUE_INVALID,
+        MOVE_TILES_UNOWNED, MOVE_INVALID,
+        DECK_EMPTY, TRADE_FIRST_TURN,
+        INVALID_CHANNEL,
+        CHALLENGE_SELF, NOT_CHALLENGED
+    }
+
+    /**
      * <p>Sent by the client when connecting to a server to identify itself.</p>
-     * <p>The player name must match regex <code>^[a-zA-Z0-9-_]$</code></p>
-     * <p>The player name must be unique.</p>
+     * <p>The player name must match regex <code>^[a-zA-Z0-9-_]$</code> <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#NAME_INVALID }</code></p>
+     * <p>The player name must be unique. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#NAME_USED }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -50,7 +65,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to enter a queue for a n-player game.</p>
-     * <p>The player can queue for 2, 3 or 4 player games.</p>
+     * <p>The player can queue for 2, 3 or 4 player games. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#QUEUE_INVALID }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -65,9 +80,8 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to put tiles on the board as a move.</p>
-     * <p>The player can play 1 to 6 tiles in one turn.</p>
-     * <p>The player must own the tiles.</p>
-     * <p>The move must be valid.</p>
+     * <p>The player must own the tiles.<code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#MOVE_TILES_UNOWNED }</code></p>
+     * <p>The move must be valid. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#MOVE_INVALID }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -82,9 +96,9 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to trade tiles as a move.</p>
-     * <p>A player can trade 1 to 6 tiles in one turn.</p>
-     * <p>The player must own the tiles.</p>
-     * <p>The deck contain at least as many tiles as traded.</p>
+     * <p>The player must own the tiles. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#MOVE_TILES_UNOWNED }</code></p>
+     * <p>The deck contain at least as many tiles as traded. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#DECK_EMPTY }</code></p>
+     * <p>The player cannot trade if the board is empty. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#TRADE_FIRST_TURN }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -214,7 +228,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client when chatting.</p>
-     * <p>The channel must be <code>global</code> or <code>@playername</code>.</p>
+     * <p>The channel must be <code>global</code> or <code>@playername</code>. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#INVALID_CHANNEL }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -249,7 +263,7 @@ public interface IProtocol {
     /* Challenge */
     /**
      * <p>Sent by the client to challenge another player.</p>
-     * <p>The player cannot challenge itself.</p>
+     * <p>The player cannot challenge itself. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#CHALLENGE_SELF }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -264,7 +278,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to accept a challenge.</p>
-     * <p>The player must be challenged by the other player beforehand.</p>
+     * <p>The player must be challenged by the other player beforehand. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#NOT_CHALLENGED }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
@@ -279,7 +293,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client to decline a challenge.</p>
-     * <p>The player must be challenged by the other player beforehand.</p>
+     * <p>The player must be challenged by the other player beforehand. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#NOT_CHALLENGED }</code></p>
      *
      * <dl>
      *     <dt>Parameters:</dt>
