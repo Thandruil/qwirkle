@@ -120,7 +120,7 @@ public interface IProtocol {
      * </dl>
      * <dl>
      *     <dt>Example:</dt>
-     *     <dd><code><strong>GAMESTART</strong> ALICE BOB CAROL</code></dd>
+     *     <dd><code><strong>GAMESTART</strong> Alice Bob Carol</code></dd>
      * </dl>
      */
     String SERVER_GAMESTART = "GAMESTART";
@@ -247,16 +247,104 @@ public interface IProtocol {
     String SERVER_CHAT = "CHATOK";
 
     /* Challenge */
+    /**
+     * <p>Sent by the client to challenge another player.</p>
+     * <p>The player cannot challenge itself.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     *     <dd><code>player</code> - the player</dd>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>CHALLENGE</strong> Bob</code></dd>
+     * </dl>
+     */
     String CLIENT_CHALLENGE = "CHALLENGE";
+
+    /**
+     * <p>Sent by the client to accept a challenge.</p>
+     * <p>The player must be challenged by the other player beforehand.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     *     <dd><code>player</code> - the player</dd>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>CHALLENGE_ACCEPT</strong> Alice</code></dd>
+     * </dl>
+     */
     String CLIENT_CHALLENGE_ACCEPT = "CHALLENGE_ACCEPT";
+
+    /**
+     * <p>Sent by the client to decline a challenge.</p>
+     * <p>The player must be challenged by the other player beforehand.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     *     <dd><code>player</code> - the player</dd>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>CHALLENGE_DECLINE</strong> Alice</code></dd>
+     * </dl>
+     */
     String CLIENT_CHALLENGE_DECLINE = "CHALLENGE_DECLINE";
-    String SERVER_CHALLENGE = "CHALLENGEOK";
 
     /* Leaderboard */
+    /**
+     * <p>Sent by the client to request the leaderboard.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>LEADERBOARD</strong></code></dd>
+     * </dl>
+     */
     String CLIENT_LEADERBOARD = "LEADERBOARD";
+
+    /**
+     * <p>Sent by the server to transfer the leaderboard.</p>
+     * <p>How the leaderboard is stored may be decided by the groups themselves. One way is to store the amount of wins and losses.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     *     <dd><code>player,wins,losses</code> - list of players with their scores</dd>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>LEADERBOARDOK</strong> Alice,2,1 Bob,0,3 Carol,1,2</code></dd>
+     * </dl>
+     */
     String SERVER_LEADERBOARD = "LEADERBOARDOK";
 
-    /* Lobby */
+    /**
+     * <p>Sent by the client to request the lobby.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>LOBBY</strong></code></dd>
+     * </dl>
+     */
     String CLIENT_LOBBY = "LOBBY";
+
+    /**
+     * <p>Sent by the server to transfer the lobby.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     *     <dd><code>players</code> - list of players</dd>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>LOBBYOK</strong> Alice Bob Claire Dave</code></dd>
+     * </dl>
+     */
     String SERVER_LOBBY = "LOBBYOK";
 }
