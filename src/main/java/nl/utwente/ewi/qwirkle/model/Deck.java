@@ -51,7 +51,7 @@ public class Deck {
      *
      * @return the amount of tiles remaining
      */
-    public int size() {
+    public int remaining() {
         return this.tiles.size();
     }
 
