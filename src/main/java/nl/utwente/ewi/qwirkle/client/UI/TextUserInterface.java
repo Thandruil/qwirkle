@@ -13,7 +13,7 @@ public class TextUserInterface implements IUserInterface {
     }
 
     @Override
-    public Client.GAME_TYPE selectGameType() {
+    public Client.GameType selectGameType() {
         return null;
     }
 

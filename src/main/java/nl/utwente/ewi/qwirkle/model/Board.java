@@ -2,6 +2,7 @@ package nl.utwente.ewi.qwirkle.model;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Board is the class for containing all Tiles that are played during
@@ -14,6 +15,11 @@ import java.util.Map;
  * @since 0.1-w51
  */
 public class Board {
+
+    public enum MoveType {
+        PUT,
+        TRADE
+    }
 
     /**
      * The Map used to contain all Tiles.
@@ -118,5 +124,20 @@ public class Board {
             result += "\n";
         }
         return result;
+    }
+
+    public Set<PlacedTile> getPossibleMoveSet(Set<Tile> hand) {
+        return null;
+        // TODO: 12-1-16 IMPLEMENT!
+    }
+
+    /**
+     * Validates a move, places the tiles on the board and calculates the score
+     * @param move A set of PlacedTiles indicating the move.
+     * @return The score that should be awarded to a player for the given move.
+     */
+    public int doMove(Set<PlacedTile> move) {
+        // TODO: 12-1-16 IMPLEMENT 
+        return 0;
     }
 }

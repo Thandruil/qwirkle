@@ -10,7 +10,7 @@ import java.util.List;
 
 public class Client implements Runnable {
 
-    public enum GAME_TYPE {
+    public enum GameType {
         LOCAL,
         ONLINE
     }

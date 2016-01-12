@@ -1,12 +1,12 @@
 package nl.utwente.ewi.qwirkle.client;
 
 import nl.utwente.ewi.qwirkle.client.UI.IUserInterface;
-import nl.utwente.ewi.qwirkle.model.Deck;
-import nl.utwente.ewi.qwirkle.model.Player;
-import nl.utwente.ewi.qwirkle.model.Board;
-import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
+import nl.utwente.ewi.qwirkle.model.*;
+import nl.utwente.ewi.qwirkle.util.Logger;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class GameController {
     public static final int MIN_PLAYERS = 2;
@@ -55,7 +55,7 @@ public class GameController {
         while (true) {
             doTurn();
             for (int i = playerList.get(playerTurn).getHand().size(); i < Deck.HAND_SIZE; i++) {
-                if (this.deck.size() >= 1) {
+                if (this.deck.remaining() >= 1) {
                     playerList.get(playerTurn).addTile(this.deck.drawTile());
                 }
             }
@@ -69,12 +69,56 @@ public class GameController {
     }
 
     public void doTurn() {
-        //Calculate possible moves
-        //if possible moves is 0 then a pass is forced
+        Set<PlacedTile> possiblePutSet = this.board.getPossibleMoveSet(playerList.get(playerTurn).getHand());
+        int tradeAmount = Math.min(playerList.get(playerTurn).getHand().size(), this.deck.remaining());
 
-        playerList.get(playerTurn).getMove();
-        //Check possible moves for player
-        //Ask move from player
+        if (tradeAmount == 0 && possiblePutSet.size() == 0) {
+            //Pass
+            return;
+        } else {
+            Board.MoveType movetype;
+            if (tradeAmount > 0 && possiblePutSet.size() > 0) {
+                movetype = playerList.get(playerTurn).getMoveType();
+            } else {
+                if (tradeAmount > 0) {
+                    movetype = Board.MoveType.TRADE;
+                } else {
+                    movetype = Board.MoveType.PUT;
+                }
+            }
+            if (movetype == Board.MoveType.TRADE) { // ASK TRADE
+                Set<Tile> tradeMove = null;
+                while (tradeMove == null) {
+                    tradeMove = playerList.get(playerTurn).getTradeMove();
+                    if (tradeMove.size() < 1 || tradeMove.size() > tradeAmount) {
+                        // TODO: 12-1-16 CHECK IF TILES ARE ACTUALLY IN PLAYERS HAND
+                        tradeMove = null;
+                    }
+                }
+                Set<Tile> newTiles = new HashSet<>();
+                for (int i = 1; i <= tradeMove.size(); i++) {
+                    newTiles.add(this.deck.drawTile());
+                }
+                for (Tile t : tradeMove) {
+                    try {
+                        playerList.get(playerTurn).removeTile(t);
+                    } catch (TileDoesNotExistException e) {
+                        Logger.error("Error: Could not remove tile from hand during trade, because it is not in the hand.");
+                    }
+                    this.deck.addTile(t);
+                }
+                playerList.get(playerTurn).addTile(newTiles);
+            } else { // ASK PUT
+                playerList.get(playerTurn).getPutMove();
+                // TODO: 12-1-16 TEST IF MOVE IS IN possiblePutSet 
+                // TODO: 12-1-16 PUT TILES ON BOARD 
+                // TODO: 12-1-16 ADD SCORE TO PLAYER 
+                
+            }
+
+            //Check possible moves for player
+            //Ask move from player
+        }
     }
 
     private boolean isEnded() {

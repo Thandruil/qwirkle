@@ -8,7 +8,7 @@ import java.util.List;
 public interface IUserInterface {
     void init();
 
-    Client.GAME_TYPE selectGameType();
+    Client.GameType selectGameType();
     List<Player> selectPlayers();
     void initBoard();
     void gameOver();
