@@ -5,13 +5,33 @@ package nl.utwente.ewi.qwirkle.net;
  * contains definitions for all commands used in the protocol. An implementation has
  * to be made by the groups themselves.
  *
+ * <h3>Tiles</h3>
+ * <p>Tiles are represented by an integer. There are 6 colors and 6 shapes to be
+ * identified, resulting in 36 different combinations. First, we define the colors
+ * and shapes as integers from <code>0</code> to <code>5</code>. Using the formula
+ * <strong><code>color * 6 + shape</code></strong> we can calculate the integer for the Tile. It does
+ * not matter which shape or color is defined by which integer, as long as it is
+ * done consistently.</p>
  *
+ * <h3>Changelog</h3>
+ * <dl>
+ *     <dt>0.2</dt>
+ *     <dd>Added {@link nl.utwente.ewi.qwirkle.net.IProtocol#VERSION} number</dd>
+ *     <dd>Changed {@link nl.utwente.ewi.qwirkle.net.IProtocol#CLIENT_IDENTIFY} name regex</dd>
+ *     <dd>Changed {@link nl.utwente.ewi.qwirkle.net.IProtocol#CLIENT_IDENTIFY} example</dd>
+ *     <dd>Renamed COMMAND_NOT_FOUND to {@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#INVALID_COMMAND}</dd>
+ * </dl>
  *
  * @author Erik Gaal
- * @version 0.1
+ * @version 0.2
  * @since 0.1-w01
  */
 public interface IProtocol {
+
+    /**
+     * <p>String representing the version of the protocol.</p>
+     */
+    String VERSION = "0.2";
 
     /**
      * <p>Enumeration of the features supported by the protocol.</p>
@@ -24,7 +44,7 @@ public interface IProtocol {
      * <p>Enumeration of the error codes.</p>
      */
     enum Error {
-        COMMAND_NOT_FOUND, INVALID_PARAMETER,
+        INVALID_COMMAND, INVALID_PARAMETER,
         NAME_INVALID, NAME_USED,
         QUEUE_INVALID,
         MOVE_TILES_UNOWNED, MOVE_INVALID,
@@ -35,7 +55,7 @@ public interface IProtocol {
 
     /**
      * <p>Sent by the client when connecting to a server to identify itself.</p>
-     * <p>The player name must match regex <code>^[a-zA-Z0-9-_]$</code> <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#NAME_INVALID }</code></p>
+     * <p>The player name must match regex <code>^[a-zA-Z0-9-_]{2,16}$</code> <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#NAME_INVALID }</code></p>
      * <p>The player name must be unique. <code>{@link nl.utwente.ewi.qwirkle.net.IProtocol.Error#NAME_USED }</code></p>
      *
      * <dl>
@@ -45,7 +65,7 @@ public interface IProtocol {
      * </dl>
      * <dl>
      *     <dt>Example:</dt>
-     *     <dd><code><strong>CONNECT</strong> PlayerA CHAT,LEADERBOARD</code></dd>
+     *     <dd><code><strong>IDENTIFY</strong> PlayerA CHAT,LEADERBOARD</code></dd>
      * </dl>
      */
     String CLIENT_IDENTIFY = "IDENTIFY";
