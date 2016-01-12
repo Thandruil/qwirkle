@@ -36,33 +36,30 @@ public class Board {
     /**
      * Get the Tile at an x, y coordinate.
      *
-     * @param x X-coordinate
-     * @param y Y-coordinate
+     * @param c Coordinale
      * @return the Tile at the coordinates
      */
-    public Tile get(int x, int y) {
-        return map.get(encodeString(x, y));
+    public Tile get(Coordinate c) {
+        return map.get(c.toString());
     }
 
     /**
      * Places a given Tile at an x, y coordinate.
      *
-     * @param x X-coordinate
-     * @param y Y-coordinate
+     * @param c Coordinate
      * @param tile the Tile to be placed
      */
-    public void put(int x, int y, Tile tile) {
-        map.put(encodeString(x, y), tile);
+    public void put(Coordinate c, Tile tile) {
+        map.put(c.toString(), tile);
     }
 
     /**
      * Removes a Tile at an x, y coordinate.
      *
-     * @param x X-coordinate
-     * @param y Y-coordinate
+     * @param c Coordinate
      */
-    public void remove(int x, int y) {
-        map.remove(encodeString(x, y));
+    public void remove(Coordinate c) {
+        map.remove(c.toString());
     }
 
     /**
@@ -73,39 +70,14 @@ public class Board {
     public int[] getBoundaries() {
         int[] boundaries = new int[4];
         for (String key : map.keySet()) {
-            int[] c = decodeString(key);
+            Coordinate c = Coordinate.fromString(key);
 
-            boundaries[0] = Math.max(boundaries[0], c[1]);
-            boundaries[1] = Math.max(boundaries[1], c[0]);
-            boundaries[2] = Math.min(boundaries[2], c[1]);
-            boundaries[3] = Math.min(boundaries[3], c[0]);
+            boundaries[0] = Math.max(boundaries[0], c.getY());
+            boundaries[1] = Math.max(boundaries[1], c.getX());
+            boundaries[2] = Math.min(boundaries[2], c.getY());
+            boundaries[3] = Math.min(boundaries[3], c.getX());
         }
         return boundaries;
-    }
-
-    /**
-     * Encodes an x, y coordinate to a String.
-     *
-     * @param x X-coordinate
-     * @param y Y-coordinate
-     * @return a String representing the coordinate
-     */
-    private String encodeString(int x, int y) {
-        return String.format("%d,%d", x, y);
-    }
-
-    /**
-     * Decodes a String to an x, y coordinate.
-     *
-     * @param hash the String to be decoded
-     * @return the coordinate
-     */
-    private int[] decodeString(String hash) {
-        String[] hash1 = hash.split(",");
-        return new int[] {
-                Integer.parseInt(hash1[0]),
-                Integer.parseInt(hash1[1])
-        };
     }
 
     /**
@@ -118,7 +90,7 @@ public class Board {
         String result = "";
         for (int y = boundaries[2]; y <= boundaries[0]; y++) {
             for (int x = boundaries[3]; x < boundaries[1]; x++) {
-                Tile tile = get(x, y);
+                Tile tile = get(new Coordinate(x, y));
                 result += tile == null ? "  " : tile.toString() + " ";
             }
             result += "\n";
@@ -126,7 +98,7 @@ public class Board {
         return result;
     }
 
-    public Set<PlacedTile> getPossibleMoveSet(Set<Tile> hand) {
+    public Set<Map<String, Tile>> getPossibleMoveSet(Set<Tile> hand) {
         return null;
         // TODO: 12-1-16 IMPLEMENT!
     }
@@ -136,8 +108,8 @@ public class Board {
      * @param move A set of PlacedTiles indicating the move.
      * @return The score that should be awarded to a player for the given move.
      */
-    public int doMove(Set<PlacedTile> move) {
-        // TODO: 12-1-16 IMPLEMENT 
+    public int doMove(Map<String, Tile> move) {
+        // TODO: 12-1-16 IMPLEMENT
         return 0;
     }
 }

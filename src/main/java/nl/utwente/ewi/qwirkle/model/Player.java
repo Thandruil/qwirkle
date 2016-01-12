@@ -1,6 +1,7 @@
 package nl.utwente.ewi.qwirkle.model;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public abstract class Player {
@@ -76,7 +77,7 @@ public abstract class Player {
 
     public abstract Set<Tile> getTradeMove();
 
-    public abstract Set<PlacedTile> getPutMove();
+    public abstract Set<Map<String, Tile>> getPutMove();
 
     public abstract String toString();
 }

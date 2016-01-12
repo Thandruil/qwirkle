@@ -6,6 +6,7 @@ import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class GameController {
@@ -69,7 +70,7 @@ public class GameController {
     }
 
     public void doTurn() {
-        Set<PlacedTile> possiblePutSet = this.board.getPossibleMoveSet(playerList.get(playerTurn).getHand());
+        Set<Map<String, Tile>> possiblePutSet = this.board.getPossibleMoveSet(playerList.get(playerTurn).getHand());
         int tradeAmount = Math.min(playerList.get(playerTurn).getHand().size(), this.deck.remaining());
 
         if (tradeAmount == 0 && possiblePutSet.size() == 0) {
@@ -115,9 +116,6 @@ public class GameController {
                 // TODO: 12-1-16 ADD SCORE TO PLAYER 
                 
             }
-
-            //Check possible moves for player
-            //Ask move from player
         }
     }
 
