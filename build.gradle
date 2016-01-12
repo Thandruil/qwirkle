@@ -1,5 +1,5 @@
 group 'nl.utwente.ewi'
-version '0.1-w46'
+version '0.1-w'
 
 apply plugin: 'java'
 apply plugin: 'idea'
@@ -12,4 +12,10 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'nl.utwente.ewi.qwirkle.Main'
+    }
 }
