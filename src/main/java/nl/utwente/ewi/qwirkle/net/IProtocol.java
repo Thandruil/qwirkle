@@ -15,6 +15,10 @@ package nl.utwente.ewi.qwirkle.net;
  *
  * <h3>Changelog</h3>
  * <dl>
+ *     <dt>0.3</dt>
+ *     <dd>Added {@link nl.utwente.ewi.qwirkle.net.IProtocol#SERVER_PASS}</dd>
+ * </dl>
+ * <dl>
  *     <dt>0.2</dt>
  *     <dd>Added {@link nl.utwente.ewi.qwirkle.net.IProtocol#VERSION} number</dd>
  *     <dd>Changed {@link nl.utwente.ewi.qwirkle.net.IProtocol#CLIENT_IDENTIFY} name regex</dd>
@@ -23,7 +27,7 @@ package nl.utwente.ewi.qwirkle.net;
  * </dl>
  *
  * @author Erik Gaal
- * @version 0.2
+ * @version 0.3
  * @since 0.1-w01
  */
 public interface IProtocol {
@@ -187,6 +191,21 @@ public interface IProtocol {
      * </dl>
      */
     String SERVER_TURN = "TURN";
+
+    /**
+     * <p>Sent by the server to announce the turn which is automatically passed.</p>
+     * <p>The server must send this if the player cannot do a valid move.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     *     <dd><code>player</code> - the player</dd>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>PASS</strong> Bob</code></dd>
+     * </dl>
+     */
+    String SERVER_PASS = "PASS";
 
     /**
      * <p>Sent by the server to draw a player a new tile.</p>
