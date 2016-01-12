@@ -13,7 +13,7 @@ import java.util.Map;
  * @version %I%
  * @since 0.1-w51
  */
-class Board {
+public class Board {
 
     /**
      * The Map used to contain all Tiles.
