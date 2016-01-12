@@ -9,7 +9,7 @@ public class Logger {
     public static final int DEBUG = 5;
     public static final int ALL = 6;
 
-    private static int level;
+    private static int level = 6;
 
     public static void setLevel(int level) {
         Logger.level = level;
@@ -17,31 +17,52 @@ public class Logger {
 
     public static void fatal(Object message) {
         if (Logger.FATAL <= level) {
-            System.err.println(message);
+            System.out.printf("[FATAL] %s\n", message);
+        }
+    }
+
+    public static void fatal(Object message, Throwable e) {
+        if (Logger.FATAL <= level) {
+            System.out.printf("[FATAL] %s\n", message);
+            System.out.printf("[FATAL] The exception was %s: %s\n", e.getClass(), e.getMessage());
         }
     }
 
     public static void error(Object message) {
         if (Logger.ERROR <= level) {
-            System.err.println(message);
+            System.out.printf("[ERROR] %s\n", message);
+        }
+    }
+
+    public static void error(Object message, Throwable e){
+        if (Logger.ERROR <= level) {
+            System.out.printf("[ERROR] %s\n", message);
+            System.out.printf("[ERROR] The exception was %s: %s\n", e.getClass(), e.getMessage());
         }
     }
 
     public static void warn(Object message) {
         if (Logger.WARN <= level) {
-            System.out.println(message);
+            System.out.printf("[WARN] %s\n", message);
+        }
+    }
+
+    public static void warn(Object message, Throwable e){
+        if (Logger.ERROR <= level) {
+            System.out.printf("[WARN] %s\n", message);
+            System.out.printf("[WARN] The exception was %s: %s\n", e.getClass(), e.getMessage());
         }
     }
 
     public static void info(Object message) {
         if (Logger.INFO <= level) {
-            System.out.println(message);
+            System.out.printf("[INFO] %s\n", message);
         }
     }
 
     public static void debug(Object message) {
         if (Logger.DEBUG <= level) {
-            System.out.println(message);
+            System.out.printf("[DEBUG] %s\n", message);
         }
     }
 }
