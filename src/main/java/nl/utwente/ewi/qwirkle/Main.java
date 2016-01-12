@@ -6,7 +6,11 @@ import nl.utwente.ewi.qwirkle.util.Logger;
 
 public class Main {
 
-    static final String USAGE_STRING = "usage: java -jar qwirkle.jar [--client] [--server]";
+    static final String USAGE_STRING = "" +
+            "usage: java -jar qwirkle.jar [-client] [-server] [-v[vv]]\n" +
+            "\t-client\t\tRun the client.\n" +
+            "\t-server\t\tRun the server.\n" +
+            "\t-v\t\t\tVerbose mode. Causes qwirkle to print debugging messages. Multiple -v increase verbosity.";
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -14,20 +18,36 @@ public class Main {
             System.exit(1);
         }
 
+        boolean server = false;
+        String[] newArgs = new String[]{};
+
         for (String arg : args) {
-            switch (args[0]) {
-                case "--client":
-                    Client.main(args);
+            switch (arg) {
+                case "-client":
+                    server = false;
                     break;
-                case "--server":
-                    Server.main(args);
+                case "-server":
+                    server = true;
                     break;
-                case "--verbose":
-                    Logger.setLevel(Logger.ALL);
+                case "-v":
+                    Logger.setLevel(Logger.WARN);
+                    break;
+                case "-vv":
+                    Logger.setLevel(Logger.INFO);
+                    break;
+                case "-vvv":
+                    Logger.setLevel(Logger.DEBUG);
+                    break;
                 default:
                     System.out.println(USAGE_STRING);
                     System.exit(1);
             }
+        }
+
+        if (server) {
+            Server.main(newArgs);
+        } else {
+            Client.main(newArgs);
         }
     }
 }
