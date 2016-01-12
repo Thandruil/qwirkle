@@ -20,7 +20,7 @@ public class GameController {
         if (playerList.size() >= MIN_PLAYERS && playerList.size() <= MAX_PLAYERS) {
             this.playerList = playerList;
             this.deck = new Deck();
-            this.playerTurn = 0;
+            this.board = new Board();
         } else {
             throw new PlayerAmountInvalidException("The player amount " + playerList.size() + " is not between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
         }
@@ -33,6 +33,9 @@ public class GameController {
         }
     }
 
+    /**
+     * Calculates the next player and puts it in playerTurn.
+     */
     private void nextPlayer() {
         playerTurn = (playerTurn + 1) % playerList.size();
     }

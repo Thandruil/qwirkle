@@ -91,6 +91,11 @@ public class Tile {
         return String.format("\u001B[0;%sm %s \u001B[m", this.color.c + 30, this.shape.c);
     }
 
+    /**
+     * Compares the tile against another tile and checks if the color and the thape are the same.
+     * @param o The object you want to compare this with.
+     * @return A boolean representing if the this and the parameter o match.
+     */
     public boolean equalsType(Object o) {
         return o instanceof Tile && ((Tile) o).getColor() == getColor() && ((Tile) o).getShape() == getShape();
     }
