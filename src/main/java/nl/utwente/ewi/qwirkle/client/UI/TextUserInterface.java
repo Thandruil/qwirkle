@@ -48,15 +48,21 @@ public class TextUserInterface implements IUserInterface {
 
     @Override
     public List<Player> selectPlayers() {
+        // TODO: 12-1-16 IMPLEMENT PLAYER SELECTION 
         return null;
     }
 
     @Override
-    public void initBoard() {}
+    public void initBoard() {
+        // TODO: 12-1-16 IMPLEMENT BOARD SHOWING 
+    }
 
     @Override
     public void gameOver() {
-
+        clear();
+        System.out.println("Game over!");
+        // TODO: 12-1-16 ADD SCORE LIST 
+        // TODO: 12-1-16 ADD CONTINUE TO MAIN MENU 
     }
 
     public void exit() {
