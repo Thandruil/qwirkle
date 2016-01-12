@@ -2,6 +2,8 @@ package nl.utwente.ewi.qwirkle.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Deck is the class for the stack of tiles that are not yet in play.
@@ -18,6 +20,11 @@ public class Deck {
      * Initial amount of Tiles that need to be in the Deck.
      */
     public static final int SIZE = 108;
+
+    /**
+     * Size of a hand at the start of a game.
+     */
+    public static final int HAND_SIZE = 6;
 
     /**
      * List of Tiles that are in the Deck.
@@ -69,10 +76,10 @@ public class Deck {
      *
      * @return the first six tiles in the Deck
      */
-    public Tile[] drawHand() {
-        Tile[] hand = new Tile[6];
-        for (int i = 0; i < 6; i++) {
-            hand[i] = this.drawTile();
+    public Set<Tile> drawHand() {
+        Set<Tile> hand = new HashSet<>();
+        for (int i = 0; i < HAND_SIZE; i++) {
+            hand.add(this.drawTile());
         }
         return hand;
     }
