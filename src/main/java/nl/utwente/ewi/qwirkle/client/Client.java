@@ -40,7 +40,9 @@ public class Client implements Runnable {
                     playerList = ui.selectPlayers();
                 }
                 try {
-                    game = new GameController(playerList);
+                    game = new GameController(ui, playerList);
+                    game.init();
+                    ui.initBoard();
                 } catch (PlayerAmountInvalidException e) {
                     Logger.error("PlayerAmountInvalidException occoured.", e);
                 }

@@ -20,9 +20,12 @@ public abstract class Player {
 
     private Set<Tile> hand;
 
+    private int score;
+
     public Player(String name) throws PlayerNameInvalidException {
         setName(name);
         this.hand = new HashSet<>();
+        this.score = 0;
     }
 
     public void setName(String name) throws PlayerNameInvalidException {
@@ -35,6 +38,14 @@ public abstract class Player {
 
     public String getName() {
         return this.name;
+    }
+
+    public int getScore() {
+        return this.score;
+    }
+
+    public void addScore(int score) {
+        this.score += score;
     }
 
     public Set<Tile> getHand() {

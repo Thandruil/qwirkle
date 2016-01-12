@@ -21,4 +21,12 @@ public class TextUserInterface implements IUserInterface {
     public List<Player> selectPlayers() {
         return null;
     }
+
+    @Override
+    public void initBoard() {}
+
+    @Override
+    public void gameOver() {
+
+    }
 }

@@ -10,4 +10,6 @@ public interface IUserInterface {
 
     Client.GAME_TYPE selectGameType();
     List<Player> selectPlayers();
+    void initBoard();
+    void gameOver();
 }

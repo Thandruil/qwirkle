@@ -69,6 +69,14 @@ public class Deck {
      */
     public Tile drawTile() {
         return this.tiles.remove(0);
+    } // TODO: 12-1-16 Add exception when deck is empty
+
+    /**
+     * Returns the amount of tiles left in the deck.
+     * @return The amount of tiles left in the deck.
+     */
+    public int size() {
+        return this.tiles.size();
     }
 
     /**
