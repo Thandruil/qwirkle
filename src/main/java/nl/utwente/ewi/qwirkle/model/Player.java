@@ -77,7 +77,7 @@ public abstract class Player {
 
     public abstract Set<Tile> getTradeMove();
 
-    public abstract Set<Map<String, Tile>> getPutMove();
+    public abstract Map<String, Tile> getPutMove();
 
     public abstract String toString();
 }

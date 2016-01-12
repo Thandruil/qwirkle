@@ -40,7 +40,7 @@ public class GameController {
     /**
      * Initializes a game by shuffling the deck, giving hands to players and determining the starting player.
      */
-    public void init() {
+    private void init() {
         // TODO: 12-1-16 New deck creation
         // TODO: 12-1-16 Empty all player hands
         deck.shuffle();
@@ -52,7 +52,11 @@ public class GameController {
         playerTurn = 0;
     }
 
+    /**
+     * This function plays a whole game.
+     */
     public void play() {
+        init();
         while (true) {
             doTurn();
             for (int i = playerList.get(playerTurn).getHand().size(); i < Deck.HAND_SIZE; i++) {
@@ -69,7 +73,10 @@ public class GameController {
         ui.gameOver();
     }
 
-    public void doTurn() {
+    /**
+     * Includes all the actions in a turn of a single player, marked by playerTurn.
+     */
+    private void doTurn() {
         Set<Map<String, Tile>> possiblePutSet = this.board.getPossibleMoveSet(playerList.get(playerTurn).getHand());
         int tradeAmount = Math.min(playerList.get(playerTurn).getHand().size(), this.deck.remaining());
 
@@ -110,15 +117,18 @@ public class GameController {
                 }
                 playerList.get(playerTurn).addTile(newTiles);
             } else { // ASK PUT
-                playerList.get(playerTurn).getPutMove();
+                Map<String, Tile> putMove = playerList.get(playerTurn).getPutMove();
                 // TODO: 12-1-16 TEST IF MOVE IS IN possiblePutSet 
-                // TODO: 12-1-16 PUT TILES ON BOARD 
-                // TODO: 12-1-16 ADD SCORE TO PLAYER 
+                playerList.get(playerTurn).addScore(this.board.doMove(putMove));
                 
             }
         }
     }
 
+    /**
+     * Checks if a game has ended.
+     * @return Boolean if a game has ended.
+     */
     private boolean isEnded() {
         // TODO: 12-1-16 IMPLEMENT NO MOVES LEFT FOR ANYONE
         return (playerList.get(playerTurn).getHand().size() == 0);
