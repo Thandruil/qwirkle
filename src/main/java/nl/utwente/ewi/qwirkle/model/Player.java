@@ -45,9 +45,23 @@ public abstract class Player {
         this.hand.add(tile);
     }
 
-    public void removeTile(Tile tile) {
-        this.hand.remove(tile);
+    public void addTile(Set<Tile> tileSet) {
+        for (Tile t : tileSet) {
+            addTile(t);
+        }
+    }
+
+    public void removeTile(Tile tile) throws TileDoesNotExistException {
+        for (Tile t : this.hand) {
+            if (t.equals(tile)) {
+                this.hand.remove(t);
+                return;
+            }
+        }
+        throw new TileDoesNotExistException("Trying to remove tile " + tile + " from the hand of player " + this + ", but it is not in the hand.s");
     }
 
     public abstract Set<Move> getMove();
+
+    public abstract String toString();
 }

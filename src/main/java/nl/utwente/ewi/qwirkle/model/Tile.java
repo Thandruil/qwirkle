@@ -91,7 +91,7 @@ public class Tile {
         return String.format("\u001B[0;%sm %s \u001B[m", this.color.c + 30, this.shape.c);
     }
 
-    public boolean equals(Object o) {
+    public boolean equalsType(Object o) {
         return o instanceof Tile && ((Tile) o).getColor() == getColor() && ((Tile) o).getShape() == getShape();
     }
 }
