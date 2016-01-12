@@ -1,0 +1,53 @@
+package nl.utwente.ewi.qwirkle.model;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public abstract class Player {
+
+    public final static String NAME_REGEX = "^[A-Za-z0-9_-]{2,16}$";
+
+    public enum STATES {
+        NOTHING,        // The player is in the menu and is not linked to a game or server yet.
+        CONNECTED,      // The player wants to play online and is connected to a server.
+        JOINED,         // The player is playing online and joined a server successfully. The player is not in a game.
+        QUEUE,          // The player is playing online and in a matchmaking queue for a game.
+        GAME_WAITING,   // The player is in a game but waiting for the server or other players.
+        GAME_TURN       // The player is in a game and is on turn.
+    }
+
+    private String name;
+
+    private Set<Tile> hand;
+
+    public Player(String name) throws PlayerNameInvalidException {
+        setName(name);
+        this.hand = new HashSet<>();
+    }
+
+    public void setName(String name) throws PlayerNameInvalidException {
+        if (name.matches(NAME_REGEX)) {
+            this.name = name;
+        } else {
+            throw new PlayerNameInvalidException("The name " + name + " is invalid.");
+        }
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Set<Tile> getHand() {
+        return this.hand;
+    }
+
+    public void addTile(Tile tile) {
+        this.hand.add(tile);
+    }
+
+    public void removeTile(Tile tile) {
+        this.hand.remove(tile);
+    }
+
+    public abstract Set<Move> getMove();
+}
