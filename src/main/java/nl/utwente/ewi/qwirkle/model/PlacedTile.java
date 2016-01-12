@@ -1,10 +1,10 @@
 package nl.utwente.ewi.qwirkle.model;
 
-public class Move {
+public class PlacedTile {
     private Coordinate coordinate;
     private Tile tile;
 
-    public Move(Coordinate c, Tile t) {
+    public PlacedTile(Coordinate c, Tile t) {
         this.coordinate = c;
         this.tile = t;
     }

@@ -72,7 +72,7 @@ public abstract class Player {
         throw new TileDoesNotExistException("Trying to remove tile " + tile + " from the hand of player " + this + ", but it is not in the hand.s");
     }
 
-    public abstract Set<Move> getMove();
+    public abstract Set<PlacedTile> getMove();
 
     public abstract String toString();
 }
