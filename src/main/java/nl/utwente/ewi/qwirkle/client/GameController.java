@@ -5,7 +5,7 @@ import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.Board;
 import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
 
-import java.util.Set;
+import java.util.List;
 
 public class GameController {
     public static final int MIN_PLAYERS = 2;
@@ -13,23 +13,28 @@ public class GameController {
 
     private Board board;
     private Deck deck;
-    private Set<Player> playerSet;
+    private List<Player> playerList;
+    private int playerTurn;
 
-    public GameController(Set<Player> playerSet) throws PlayerAmountInvalidException {
-        if (playerSet.size() >= MIN_PLAYERS && playerSet.size() <= MAX_PLAYERS) {
-            this.playerSet = playerSet;
+    public GameController(List<Player> playerList) throws PlayerAmountInvalidException {
+        if (playerList.size() >= MIN_PLAYERS && playerList.size() <= MAX_PLAYERS) {
+            this.playerList = playerList;
             this.deck = new Deck();
+            this.playerTurn = 0;
         } else {
-            throw new PlayerAmountInvalidException("The player amount " + playerSet.size() + " is not between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
+            throw new PlayerAmountInvalidException("The player amount " + playerList.size() + " is not between " + MIN_PLAYERS + " and " + MAX_PLAYERS + ".");
         }
     }
 
     public void init() {
         deck.shuffle();
-        for (Player p : playerSet) {
+        for (Player p : playerList) {
             p.addTile(deck.drawHand());
         }
+    }
 
+    private void nextPlayer() {
+        playerTurn = (playerTurn + 1) % playerList.size();
     }
 
 }

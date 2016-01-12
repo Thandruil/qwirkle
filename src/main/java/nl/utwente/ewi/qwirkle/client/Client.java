@@ -6,7 +6,7 @@ import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
-import java.util.Set;
+import java.util.List;
 
 public class Client implements Runnable {
 
@@ -35,12 +35,12 @@ public class Client implements Runnable {
     void loop() {
         switch(ui.selectGameType()) {
             case LOCAL:
-                Set<Player> playerSet = ui.selectPlayers();
-                while (playerSet.size() >= 2 && playerSet.size() <= 4) {
-                    playerSet = ui.selectPlayers();
+                List<Player> playerList = ui.selectPlayers();
+                while (playerList.size() >= 2 && playerList.size() <= 4) {
+                    playerList = ui.selectPlayers();
                 }
                 try {
-                    game = new GameController(playerSet);
+                    game = new GameController(playerList);
                 } catch (PlayerAmountInvalidException e) {
                     Logger.error("PlayerAmountInvalidException occoured.", e);
                 }

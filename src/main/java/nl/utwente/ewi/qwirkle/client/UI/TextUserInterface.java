@@ -3,7 +3,7 @@ package nl.utwente.ewi.qwirkle.client.UI;
 import nl.utwente.ewi.qwirkle.client.Client;
 import nl.utwente.ewi.qwirkle.model.Player;
 
-import java.util.Set;
+import java.util.List;
 
 public class TextUserInterface implements IUserInterface {
 
@@ -18,7 +18,7 @@ public class TextUserInterface implements IUserInterface {
     }
 
     @Override
-    public Set<Player> selectPlayers() {
+    public List<Player> selectPlayers() {
         return null;
     }
 }
