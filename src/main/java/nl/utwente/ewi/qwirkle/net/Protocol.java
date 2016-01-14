@@ -13,9 +13,8 @@ public class Protocol implements IProtocol {
     public static void parsePacket(String packet) throws ProtocolException {
         String[] packetWords = packet.split(" ");
         String command = packetWords[0];
-        String[] args = new String[0];
+        String[] args = new String[packetWords.length - 1];
         System.arraycopy(packetWords, 1, args, 0, packetWords.length - 1);
-
         switch (command) {
             case CLIENT_IDENTIFY:
                 if (args.length > 1) return;
