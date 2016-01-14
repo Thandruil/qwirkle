@@ -1,5 +1,5 @@
 group 'nl.utwente.ewi'
-version '0.1-w'
+version '0.1-w02'
 
 apply plugin: 'java'
 apply plugin: 'idea'
