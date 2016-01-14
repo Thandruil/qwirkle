@@ -1,5 +1,7 @@
 package nl.utwente.ewi.qwirkle.model;
 
+import nl.utwente.ewi.qwirkle.client.GameController;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -24,7 +26,7 @@ public class Board {
     /**
      * The Map used to contain all Tiles.
      */
-    Map<String, Tile> map;
+    Map<Coordinate, Tile> map;
 
     /**
      * Creates a new Board with an empty HashMap.
@@ -40,7 +42,7 @@ public class Board {
      * @return the Tile at the coordinates
      */
     public Tile get(Coordinate c) {
-        return map.get(c.toString());
+        return map.get(c);
     }
 
     /**
@@ -50,7 +52,7 @@ public class Board {
      * @param tile the Tile to be placed
      */
     public void put(Coordinate c, Tile tile) {
-        map.put(c.toString(), tile);
+        map.put(c, tile);
     }
 
     /**
@@ -59,7 +61,7 @@ public class Board {
      * @param c Coordinate
      */
     public void remove(Coordinate c) {
-        map.remove(c.toString());
+        map.remove(c);
     }
 
     /**
@@ -69,9 +71,7 @@ public class Board {
      */
     public int[] getBoundaries() {
         int[] boundaries = new int[4];
-        for (String key : map.keySet()) {
-            Coordinate c = Coordinate.fromString(key);
-
+        for (Coordinate c : map.keySet()) {
             boundaries[0] = Math.max(boundaries[0], c.getY());
             boundaries[1] = Math.max(boundaries[1], c.getX());
             boundaries[2] = Math.min(boundaries[2], c.getY());
@@ -98,7 +98,7 @@ public class Board {
         return result;
     }
 
-    public Set<Map<String, Tile>> getPossibleMoveSet(Set<Tile> hand) {
+    public Set<Map<Coordinate, Tile>> getPossibleMoveSet(Set<Tile> hand) {
         return null;
         // TODO: 12-1-16 IMPLEMENT!
     }
@@ -108,8 +108,45 @@ public class Board {
      * @param move A set of PlacedTiles indicating the move.
      * @return The score that should be awarded to a player for the given move.
      */
-    public int doMove(Map<String, Tile> move) {
-        // TODO: 12-1-16 IMPLEMENT
-        return 0;
+    public int doMove(Map<Coordinate, Tile> move) {
+        if (validateMove(move)) {
+            // TODO: 12-1-16 IMPLEMENT
+            return 0;
+        } else {
+            return 0;
+        }
+    }
+
+    public boolean validateMove(Map<Coordinate, Tile> move) {
+        if (move == null || move.size() <= 0 || move.size() > Deck.HAND_SIZE) {
+            return false; // Amount of placedTiles is not valid
+        }
+        // Check horizontal/vertical line
+        boolean horizontal = true;
+        int currentX = 0;
+        boolean vertical = true;
+        int currentY = 0;
+        boolean first = true;
+        for (Coordinate c : move.keySet()) {
+            if (first) {
+                currentX = c.getX();
+                currentY = c.getY();
+                first = false;
+            } else {
+                if (currentX != c.getX()) {
+                    horizontal = false;
+                }
+                if (currentY != c.getY()) {
+                    vertical = false;
+                }
+            }
+            if (horizontal) {
+
+            } else if (vertical) {
+
+            } else {
+                return false; // The tiles are not on the same row or column
+            }
+        }
     }
 }

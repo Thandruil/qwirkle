@@ -141,4 +141,10 @@ public class GameController {
         playerTurn = (playerTurn + 1) % playerList.size();
     }
 
+    public Board getBoardCopy() {
+        Board b = new Board();
+
+        return b;
+    }
+
 }

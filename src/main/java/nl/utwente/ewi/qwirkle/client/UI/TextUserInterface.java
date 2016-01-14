@@ -1,14 +1,21 @@
 package nl.utwente.ewi.qwirkle.client.UI;
 
 import nl.utwente.ewi.qwirkle.client.Client;
+import nl.utwente.ewi.qwirkle.client.GameController;
+import nl.utwente.ewi.qwirkle.model.HumanPlayer;
 import nl.utwente.ewi.qwirkle.model.Player;
+import nl.utwente.ewi.qwirkle.model.PlayerNameInvalidException;
+import nl.utwente.ewi.qwirkle.util.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class TextUserInterface implements IUserInterface {
 
     Scanner scanner;
+
+    GameController game;
 
     public TextUserInterface() {
         scanner = new Scanner(System.in);
@@ -48,12 +55,27 @@ public class TextUserInterface implements IUserInterface {
 
     @Override
     public List<Player> selectPlayers() {
-        // TODO: 12-1-16 IMPLEMENT PLAYER SELECTION 
+        // TODO: 12-1-16 IMPLEMENT PLAYER SELECTION
+        Player p1;
+        Player p2;
+        try {
+            p1 = new HumanPlayer("Erik");
+            p2 = new HumanPlayer("Jasper");
+            List<Player> plist = new ArrayList<>();
+            plist.add(p1);
+            plist.add(p2);
+            return plist;
+        } catch (PlayerNameInvalidException e) {
+            Logger.fatal("Names are not valid.", e);
+            System.exit(0);
+        }
         return null;
     }
 
     @Override
-    public void initBoard() {
+    public void initGame(GameController game) {
+        this.game = game;
+        // TODO: 12-1-16 ONCHANGE DRAW BOARD
         // TODO: 12-1-16 IMPLEMENT BOARD SHOWING 
     }
 
