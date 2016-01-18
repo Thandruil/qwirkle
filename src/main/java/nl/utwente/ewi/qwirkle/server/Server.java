@@ -11,6 +11,7 @@ public class Server implements Runnable {
 
     boolean running = true;
 
+    PlayerList players = new PlayerList();
 
     private int port;
     private ServerSocket server;
