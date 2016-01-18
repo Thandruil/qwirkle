@@ -175,10 +175,10 @@ public interface IProtocol {
      * </dl>
      * <dl>
      *     <dt>Example:</dt>
-     *     <dd><code><strong>CONNECTOK</strong> CHAT,LOBBY</code></dd>
+     *     <dd><code><strong>IDENTIFYOK</strong> CHAT,LOBBY</code></dd>
      * </dl>
      */
-    String SERVER_IDENITFY = "IDENTIFYOK";
+    String SERVER_IDENTIFY = "IDENTIFYOK";
 
     /**
      * <p>Sent by the server to announce a game starting.</p>
