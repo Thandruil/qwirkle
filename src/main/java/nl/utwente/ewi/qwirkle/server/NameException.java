@@ -1,4 +1,9 @@
 package nl.utwente.ewi.qwirkle.server;
 
-public class NameException extends Exception {
+import nl.utwente.ewi.qwirkle.net.IProtocol;
+
+public class NameException extends QwirkleException {
+    public NameException(IProtocol.Error error) {
+        super(error);
+    }
 }
