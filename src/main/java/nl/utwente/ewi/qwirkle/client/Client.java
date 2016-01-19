@@ -15,8 +15,6 @@ public class Client implements Runnable {
         ONLINE
     }
 
-    boolean running = true;
-
     GameController game;
 
     IUserInterface ui;
@@ -24,7 +22,8 @@ public class Client implements Runnable {
     @Override
     public void run() {
         init();
-        while (running) loop();
+        //// TODO: 19-1-16 Netter oplossen? 
+        while (true) loop();
     }
 
     void init() {
@@ -35,19 +34,22 @@ public class Client implements Runnable {
     void loop() {
         switch(ui.selectGameType()) {
             case LOCAL:
+                Logger.info("Local game has been chosen.");
                 List<Player> playerList = ui.selectPlayers();
-                while (playerList.size() >= 2 && playerList.size() <= 4) {
+                while (playerList.size() < GameController.MIN_PLAYERS && playerList.size() > GameController.MAX_PLAYERS) {
+                    Logger.info("Wrong player selection, " + playerList.size() + " players found. Chosing again . . .");
                     playerList = ui.selectPlayers();
                 }
                 try {
                     game = new GameController(ui, playerList);
-                    game.play();
                     ui.initGame(game);
+                    game.play();
                 } catch (PlayerAmountInvalidException e) {
                     Logger.error("PlayerAmountInvalidException occoured.", e);
                 }
                 break;
             case ONLINE:
+                Logger.info("Online game has been chosen.");
                 // Wacht op keuze UI: Server en port
                 // Check op server
                 // Wacht op keuze UI: Gebruikersnaam en speler type
@@ -56,10 +58,6 @@ public class Client implements Runnable {
                 // Start game
                 break;
         }
-    }
-
-    void stop() {
-        running = false;
     }
 
     public static void main(String[] args) {

@@ -1,26 +1,28 @@
 package nl.utwente.ewi.qwirkle.model;
 
+import nl.utwente.ewi.qwirkle.client.UI.IUserInterface;
+
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class HumanPlayer extends Player {
-    public HumanPlayer(String name) throws PlayerNameInvalidException {
-        super(name);
+    public HumanPlayer(IUserInterface ui, String name) throws PlayerNameInvalidException {
+        super(ui, name);
     }
 
     @Override
     public Board.MoveType getMoveType() {
-        return null;
+        return ui.getMoveType(this);
     }
 
     @Override
-    public Set<Tile> getTradeMove() {
-        return null;
+    public List<Tile> getTradeMove() {
+        return ui.getMoveTrade(this);
     }
 
     @Override
-    public Map<String, Tile> getPutMove() {
-        return null;
+    public Map<Coordinate, Tile> getPutMove() {
+        return ui.getMovePut(this);
     }
 
     @Override

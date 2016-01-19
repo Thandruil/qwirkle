@@ -96,7 +96,12 @@ public class Tile {
      * @param o The object you want to compare this with.
      * @return A boolean representing if the this and the parameter o match.
      */
-    public boolean equalsType(Object o) {
-        return o instanceof Tile && ((Tile) o).getColor() == getColor() && ((Tile) o).getShape() == getShape();
+    public boolean equals(Object o) {
+        return (o instanceof Tile && ((Tile) o).getColor() == getColor() && ((Tile) o).getShape() == getShape());
+    }
+
+    @Override
+    public int hashCode() {
+        return getColor().hashCode() * 31 + getShape().hashCode();
     }
 }

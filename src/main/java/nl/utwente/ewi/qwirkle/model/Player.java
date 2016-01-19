@@ -1,8 +1,9 @@
 package nl.utwente.ewi.qwirkle.model;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import nl.utwente.ewi.qwirkle.client.UI.IUserInterface;
+import nl.utwente.ewi.qwirkle.util.Logger;
+
+import java.util.*;
 
 public abstract class Player {
 
@@ -19,14 +20,17 @@ public abstract class Player {
 
     private String name;
 
-    private Set<Tile> hand;
+    private List<Tile> hand;
 
     private int score;
 
-    public Player(String name) throws PlayerNameInvalidException {
+    protected IUserInterface ui;
+
+    public Player(IUserInterface ui, String name) throws PlayerNameInvalidException {
         setName(name);
-        this.hand = new HashSet<>();
+        this.hand = new ArrayList<>();
         this.score = 0;
+        this.ui = ui;
     }
 
     public void setName(String name) throws PlayerNameInvalidException {
@@ -49,7 +53,7 @@ public abstract class Player {
         this.score += score;
     }
 
-    public Set<Tile> getHand() {
+    public List<Tile> getHand() {
         return this.hand;
     }
 
@@ -57,8 +61,8 @@ public abstract class Player {
         this.hand.add(tile);
     }
 
-    public void addTile(Set<Tile> tileSet) {
-        for (Tile t : tileSet) {
+    public void addTile(List<Tile> tileList) {
+        for (Tile t : tileList) {
             addTile(t);
         }
     }
@@ -73,11 +77,54 @@ public abstract class Player {
         throw new TileDoesNotExistException("Trying to remove tile " + tile + " from the hand of player " + this + ", but it is not in the hand.s");
     }
 
+    public void removeTile(List<Tile> tiles) throws TileDoesNotExistException {
+        for (Tile t : tiles) {
+            removeTile(t);
+        }
+    }
+
+    public void emptyHand() {
+        this.hand = new ArrayList<>();
+    }
+
     public abstract Board.MoveType getMoveType();
 
-    public abstract Set<Tile> getTradeMove();
+    public abstract List<Tile> getTradeMove();
 
-    public abstract Map<String, Tile> getPutMove();
+    public abstract Map<Coordinate, Tile> getPutMove();
 
     public abstract String toString();
+
+    public int longestStreak() {
+        int max = 1;
+        Set<Tile> uniqueHand = new HashSet<>(getHand());
+        Logger.debug("Streak hand size: " + uniqueHand.size());
+        for (Tile.Shape s : Tile.Shape.values()) {
+            int i = 0;
+            for (Tile t : uniqueHand) {
+                if (t.getShape() == s) {
+                    i++;
+                }
+            }
+            if (i > Math.floor(uniqueHand.size() / 2)) {
+                return i;
+            } else if (i > max) {
+                max = i;
+            }
+        }
+        for (Tile.Color s : Tile.Color.values()) {
+            int i = 0;
+            for (Tile t : uniqueHand) {
+                if (t.getColor() == s) {
+                    i++;
+                }
+            }
+            if (i > Math.floor(uniqueHand.size() / 2)) {
+                return i;
+            } else if (i > max) {
+                max = i;
+            }
+        }
+        return max;
+    }
 }

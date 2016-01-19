@@ -1,9 +1,6 @@
 package nl.utwente.ewi.qwirkle.model;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Deck is the class for the stack of tiles that are not yet in play.
@@ -25,6 +22,11 @@ public class Deck {
      * Size of a hand at the start of a game.
      */
     public static final int HAND_SIZE = 6;
+
+    /**
+     * Size of a qwirkle.
+     */
+    public static final int QWIRKLE_SIZE = 6;
 
     /**
      * List of Tiles that are in the Deck.
@@ -67,9 +69,13 @@ public class Deck {
      *
      * @return the first Tile in the Deck
      */
-    public Tile drawTile() {
-        return this.tiles.remove(0);
-    } // TODO: 12-1-16 Add exception when deck is empty
+    public Tile drawTile() throws EmptyDeckException {
+        if (this.tiles.size() >= 1) {
+            return this.tiles.remove(0);
+        } else {
+            throw new EmptyDeckException("A tile could not be drawn because the deck has not enough tiles left(" + this.tiles.size() + ").");
+        }
+    }
 
     public void addTile(Tile t) {
         this.tiles.add(t);
@@ -81,8 +87,11 @@ public class Deck {
      *
      * @return the first six tiles in the Deck
      */
-    public Set<Tile> drawHand() {
-        Set<Tile> hand = new HashSet<>();
+    public List<Tile> drawHand() throws EmptyDeckException {
+        if (this.tiles.size() < HAND_SIZE) {
+            throw new EmptyDeckException("There are not enough tiles in the deck (" + this.tiles.size() + ") to draw a hand(" + HAND_SIZE + ").");
+        }
+        List<Tile> hand = new ArrayList<>();
         for (int i = 0; i < HAND_SIZE; i++) {
             hand.add(this.drawTile());
         }

@@ -1,10 +1,9 @@
 package nl.utwente.ewi.qwirkle.model;
 
 import nl.utwente.ewi.qwirkle.client.GameController;
+import nl.utwente.ewi.qwirkle.util.Logger;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Board is the class for containing all Tiles that are played during
@@ -16,7 +15,7 @@ import java.util.Set;
  * @version %I%
  * @since 0.1-w51
  */
-public class Board {
+public class Board extends Observable {
 
     public enum MoveType {
         PUT,
@@ -53,6 +52,7 @@ public class Board {
      */
     public void put(Coordinate c, Tile tile) {
         map.put(c, tile);
+        setChanged();
     }
 
     /**
@@ -62,6 +62,7 @@ public class Board {
      */
     public void remove(Coordinate c) {
         map.remove(c);
+        setChanged();
     }
 
     /**
@@ -80,6 +81,10 @@ public class Board {
         return boundaries;
     }
 
+    public boolean isEmpty() {
+        return (this.map.keySet().size() == 0);
+    }
+
     /**
      * Get a String representation of the Board using colored characters.
      *
@@ -88,19 +93,30 @@ public class Board {
     public String toString() {
         int[] boundaries = getBoundaries();
         String result = "";
-        for (int y = boundaries[2]; y <= boundaries[0]; y++) {
-            for (int x = boundaries[3]; x < boundaries[1]; x++) {
+        for (int y = boundaries[0]; y >= boundaries[2]; y--) {
+            result += y;
+            for (int i = Integer.toString(y).length(); i < 4; i++) {
+                result += " ";
+            }
+            for (int x = boundaries[3]; x <= boundaries[1]; x++) {
                 Tile tile = get(new Coordinate(x, y));
-                result += tile == null ? "  " : tile.toString() + " ";
+                result += tile == null ? "     " : " " + tile.toString() + " ";
             }
             result += "\n";
         }
+        result += "    ";
+        for (int x = boundaries[3]; x <= boundaries[1]; x++) {
+            result += " ";
+            if (x >= 0) {
+                result += " ";
+            }
+            result += x;
+            result += " ";
+            if (x > -10 && x < 10) {
+                result += " ";
+            }
+        }
         return result;
-    }
-
-    public Set<Map<Coordinate, Tile>> getPossibleMoveSet(Set<Tile> hand) {
-        return null;
-        // TODO: 12-1-16 IMPLEMENT!
     }
 
     /**
@@ -110,43 +126,281 @@ public class Board {
      */
     public int doMove(Map<Coordinate, Tile> move) {
         if (validateMove(move)) {
-            // TODO: 12-1-16 IMPLEMENT
-            return 0;
+            Logger.debug("Length: " + move.size());
+            int score = getScore(move);
+            for (Coordinate c : move.keySet()) {
+                put(c, move.get(c));
+                Logger.debug("Put on board: " + c.getX() + "," + c.getY() + " - " + move.get(c).toString());
+            }
+            notifyObservers();
+            return score;
         } else {
             return 0;
         }
     }
 
+    private int getScore(Map<Coordinate, Tile> move) {
+        int score = 0;
+        boolean horizontal = isHorizontal(move);
+        boolean vertical = isVertical(move);
+        Logger.debug("Horizontal: " + horizontal + ", vertical: " + vertical);
+        boolean first = true;
+
+        Board tmpBoard = getCopy();
+        for (Coordinate c : move.keySet()) {
+            tmpBoard.put(c, move.get(c));
+        }
+
+        for (Coordinate c : move.keySet()) {
+            List<Tile> tileListH = new ArrayList<>();
+            List<Tile> tileListV = new ArrayList<>();
+            int i;
+
+            if (first || vertical) {
+                i = 0;
+                while (tmpBoard.get(new Coordinate(c.getX() + i, c.getY())) != null) { // Check horizontal right
+                    tileListH.add(tmpBoard.get(new Coordinate(c.getX() + i, c.getY())));
+                    i++;
+                }
+                i = 1;
+                while (tmpBoard.get(new Coordinate(c.getX() - i, c.getY())) != null) { // Check horizontal left
+                    tileListH.add(tmpBoard.get(new Coordinate(c.getX() - i, c.getY())));
+                    i++;
+                }
+                if (tileListH.size() == 1) {
+                    tileListH.clear();
+                }
+                if (tileListH.size() == Deck.QWIRKLE_SIZE) {
+                    score += tileListH.size() * 2;
+                } else if (tileListH.size() > 1 && tileListH.size() < Deck.QWIRKLE_SIZE) {
+                    score += tileListH.size();
+                }
+            }
+            if (first || horizontal) {
+                i = 0;
+                while (tmpBoard.get(new Coordinate(c.getX(), c.getY() + i)) != null) { // Check vertical up
+                    tileListV.add(tmpBoard.get(new Coordinate(c.getX(), c.getY() + i)));
+                    i++;
+                }
+                i = 1;
+                while (tmpBoard.get(new Coordinate(c.getX(), c.getY() - i)) != null) { // Check vertical down
+                    tileListV.add(tmpBoard.get(new Coordinate(c.getX(), c.getY() - i)));
+                    i++;
+                }
+                if (tileListV.size() == 1) {
+                    tileListV.clear();
+                }
+                if (tileListV.size() == Deck.QWIRKLE_SIZE) {
+                    score += tileListV.size() * 2;
+                } else if (tileListV.size() > 1 && tileListV.size() < Deck.QWIRKLE_SIZE) {
+                    score += tileListV.size();
+                }
+            }
+            if (first) {
+                first = false;
+            }
+        }
+        return score;
+    }
+
     public boolean validateMove(Map<Coordinate, Tile> move) {
-        if (move == null || move.size() <= 0 || move.size() > Deck.HAND_SIZE) {
+        //Logger.debug("Validating . . . ");
+        if (move == null || move.size() <= 0 || move.size() > Deck.QWIRKLE_SIZE) {
+            Logger.debug("Check failed: Invalid input.");
             return false; // Amount of placedTiles is not valid
         }
         // Check horizontal/vertical line
-        boolean horizontal = true;
+        boolean horizontal = isHorizontal(move);
+        boolean vertical = isVertical(move);
+
+        if (horizontal || vertical) {
+            Board tmpBoard = getCopy();
+            for (Coordinate c : move.keySet()) {
+                tmpBoard.put(c, move.get(c));
+            }
+            if (!tmpBoard.checkAllAdjacent()) {
+                Logger.debug("Not adjacent!");
+                return false;
+            }
+            for (Coordinate c : move.keySet()) {
+                List<Tile> tileList;
+                int i;
+
+                //Check horizontal
+                tileList = new ArrayList<>();
+                i = 0;
+                while (tmpBoard.get(new Coordinate(c.getX() + i, c.getY())) != null) { // Check horizontal right
+                    tileList.add(tmpBoard.get(new Coordinate(c.getX() + i, c.getY())));
+                    i++;
+                }
+                 i = 1;
+                while (tmpBoard.get(new Coordinate(c.getX() - i, c.getY())) != null) { // Check horizontal left
+                    tileList.add(tmpBoard.get(new Coordinate(c.getX() - i, c.getY())));
+                    i++;
+                }
+                Logger.debug("tileList length: " + tileList.size());
+                if (!checkTileList(tileList)) {
+                    Logger.debug("Check failed: Horizontal checkTileList failed.");
+                    return false;
+                }
+
+                //Check vertical
+                tileList = new ArrayList<>();
+                i = 0;
+                while (tmpBoard.get(new Coordinate(c.getX(), c.getY() + i)) != null) { // Check vertical up
+                    tileList.add(tmpBoard.get(new Coordinate(c.getX(), c.getY() + i)));
+                    i++;
+                }
+                i = 1;
+                while (tmpBoard.get(new Coordinate(c.getX(), c.getY() - i)) != null) { // Check vertical down
+                    tileList.add(tmpBoard.get(new Coordinate(c.getX(), c.getY() - i)));
+                    i++;
+                }
+                if (!checkTileList(tileList)) {
+                    Logger.debug("Check failed: Vertical checkTileList failed.");
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            Logger.debug("Check failed: Not horzontal or vertical.");
+            return false; // The tiles are not on the same row or column
+        }
+    }
+
+    private boolean isVertical(Map<Coordinate, Tile> move) {
         int currentX = 0;
-        boolean vertical = true;
-        int currentY = 0;
         boolean first = true;
         for (Coordinate c : move.keySet()) {
             if (first) {
                 currentX = c.getX();
-                currentY = c.getY();
                 first = false;
             } else {
                 if (currentX != c.getX()) {
-                    horizontal = false;
+                    return false;
                 }
-                if (currentY != c.getY()) {
-                    vertical = false;
-                }
-            }
-            if (horizontal) {
-
-            } else if (vertical) {
-
-            } else {
-                return false; // The tiles are not on the same row or column
             }
         }
+        return true;
+    }
+
+    private boolean isHorizontal(Map<Coordinate, Tile> move) {
+        int currentY = 0;
+        boolean first = true;
+        for (Coordinate c : move.keySet()) {
+            if (first) {
+                currentY = c.getY();
+                first = false;
+            } else {
+                if (currentY != c.getY()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    private boolean checkAllAdjacent() {
+        if (this.map.size() == 1) {
+            return true;
+        }
+        for (Coordinate c : this.map.keySet()) {
+            boolean check = false;
+            if (this.get(new Coordinate(c.getX()+1, c.getY())) != null) {
+                check = true;
+            }
+            if (this.get(new Coordinate(c.getX()-1, c.getY())) != null) {
+                check = true;
+            }
+            if (this.get(new Coordinate(c.getX(), c.getY()+1)) != null) {
+                check = true;
+            }
+            if (this.get(new Coordinate(c.getX(), c.getY()-1)) != null) {
+                check = true;
+            }
+            if (!check) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean checkTileList(List<Tile> tiles) {
+        if (tiles == null || tiles.size() <= 0 || tiles.size() > Deck.HAND_SIZE) {
+            return false;
+        }
+        if (tiles.size() == 1) {
+            return true;
+        }
+        boolean sameShape = true;
+        boolean sameColor = true;
+        boolean first = true;
+        Tile.Shape shape = null;
+        Tile.Color color = null;
+        for (Tile t : tiles) {
+            if (first) {
+                shape = t.getShape();
+                color = t.getColor();
+                first = false;
+            } else {
+                if (shape != t.getShape()) {
+                    sameShape = false;
+                }
+                if (color != t.getColor()) {
+                    sameColor = false;
+                }
+            }
+        }
+        if (sameShape && !sameColor) { // Check for different colors
+            Set<Tile.Color> allColors = new HashSet<>();
+            Collections.addAll(allColors, Tile.Color.values());
+            Logger.debug("Colors: " + allColors.size());
+            for (Tile t : tiles) {
+                Logger.debug("Checking " + t.toString());
+                if (!allColors.remove(t.getColor())) {
+                    Logger.debug("TEST 2");
+                    return false;
+                }
+            }
+            return true;
+        } else if(!sameShape && sameColor) { // Check for different shapes
+            Set<Tile.Shape> allShapes = new HashSet<>();
+            Collections.addAll(allShapes, Tile.Shape.values());
+            for (Tile t : tiles) {
+                if (!allShapes.remove(t.getShape())) {
+                    Logger.debug("TEST 3");
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            Logger.debug("TEST 4");
+            return false;
+        }
+    }
+
+    public boolean isPutPossible(List<Tile> tiles) {
+        for (Tile t : tiles) {
+            int[] boundaries = getBoundaries();
+            Logger.debug(boundaries[0] + " " + boundaries[1] + " " + boundaries[2] + " " + boundaries[3]);
+            for (int x = boundaries[3]-1; x <= boundaries[1]+1; x++) {
+                for (int y = boundaries[2]-1; y <= boundaries[0]+1; y++) {
+                    Map<Coordinate, Tile> m = new HashMap<>();
+                    m.put(new Coordinate(x, y), t);
+                    if (validateMove(m)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public Board getCopy() {
+        Board b = new Board();
+        for (Coordinate c : this.map.keySet()) {
+            b.put(c, this.map.get(c));
+        }
+        return b;
     }
 }
