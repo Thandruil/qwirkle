@@ -37,6 +37,10 @@ package nl.utwente.ewi.qwirkle.net;
  *
  * <h3>Changelog</h3>
  * <dl>
+ *     <dt>0.5</dt>
+ *     <dd>Added {@link nl.utwente.ewi.qwirkle.net.IProtocol#SERVER_QUEUE}, which the server responds with after a player queues.</dd>
+ * </dl>
+ * <dl>
  *     <dt>0.4</dt>
  *     <dd>Improved documentation</dd>
  *     <dd>Added regex for Name and Lists</dd>
@@ -179,6 +183,20 @@ public interface IProtocol {
      * </dl>
      */
     String SERVER_IDENTIFY = "IDENTIFYOK";
+
+    /**
+     * <p>Sent by the server to confirm a player queueing.</p>
+     *
+     * <dl>
+     *     <dt>Parameters:</dt>
+     *     <dd><code>numbers</code> - list of number of players</dd>
+     * </dl>
+     * <dl>
+     *     <dt>Example:</dt>
+     *     <dd><code><strong>QUEUEOK</strong> 2,4</code></dd>
+     * </dl>
+     */
+    String SERVER_QUEUE = "QUEUEOK";
 
     /**
      * <p>Sent by the server to announce a game starting.</p>
