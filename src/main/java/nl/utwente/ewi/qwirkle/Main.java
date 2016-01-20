@@ -30,13 +30,13 @@ public class Main {
                     server = true;
                     break;
                 case "-v":
-                    Logger.setLevel(Logger.WARN);
+                    Logger.addOutputStream(Logger.WARN, System.out);
                     break;
                 case "-vv":
-                    Logger.setLevel(Logger.INFO);
+                    Logger.addOutputStream(Logger.INFO, System.out);
                     break;
                 case "-vvv":
-                    Logger.setLevel(Logger.DEBUG);
+                    Logger.addOutputStream(Logger.DEBUG, System.out);
                     break;
                 default:
                     System.out.println(USAGE_STRING);
