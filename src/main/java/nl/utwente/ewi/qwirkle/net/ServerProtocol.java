@@ -7,6 +7,9 @@ import nl.utwente.ewi.qwirkle.server.packet.QueuePacket;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class ServerProtocol implements IProtocol {
 
@@ -20,6 +23,18 @@ public class ServerProtocol implements IProtocol {
 
     public static String identify() {
         return String.format("%s %s", IProtocol.SERVER_IDENTIFY, "CHAT");
+    }
+
+    public static String queue(List<Integer> queues) {
+        return String.format("%s %s", IProtocol.SERVER_QUEUE, queues.stream().map(Object::toString).collect(Collectors.joining(",")));
+    }
+
+    public static String gameStart(List<String> players) {
+        return String.format("%s %s", IProtocol.SERVER_GAMESTART, players.stream().collect(Collectors.joining(",")));
+    }
+
+    public static String gameEnd(Map<String, Integer> playerScores) {
+        return String.format("%s %s", IProtocol.SERVER_GAMEEND, playerScores.keySet().stream().map(p -> p + playerScores.get(p)).collect(Collectors.joining(" ")));
     }
 
     public static String chat(String channel, String sender, String message) {
@@ -65,11 +80,11 @@ public class ServerProtocol implements IProtocol {
                 } else throw new IllegalParameterException();
                 break;
             case CLIENT_MOVE_PUT:
-                if (args.length >= 1 && args.length <= 6);
+                if (args.length >= 1 && args.length <= 6) ;
                 else throw new IllegalParameterException();
                 break;
             case CLIENT_MOVE_TRADE:
-                if (args.length >= 1 && args.length <= 6);
+                if (args.length >= 1 && args.length <= 6) ;
                 else throw new IllegalParameterException();
                 break;
             case CLIENT_CHAT:
@@ -77,15 +92,15 @@ public class ServerProtocol implements IProtocol {
                 else throw new IllegalParameterException();
                 break;
             case CLIENT_CHALLENGE:
-                if (args.length == 1);
+                if (args.length == 1) ;
                 else throw new IllegalParameterException();
                 break;
             case CLIENT_CHALLENGE_ACCEPT:
-                if (args.length == 1);
+                if (args.length == 1) ;
                 else throw new IllegalParameterException();
                 break;
             case CLIENT_CHALLENGE_DECLINE:
-                if (args.length == 1);
+                if (args.length == 1) ;
                 else throw new IllegalParameterException();
                 break;
             case CLIENT_LEADERBOARD:

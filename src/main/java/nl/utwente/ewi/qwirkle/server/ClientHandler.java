@@ -10,6 +10,7 @@ import nl.utwente.ewi.qwirkle.util.Logger;
 import java.io.*;
 import java.net.Socket;
 import java.util.List;
+import java.util.Map;
 
 public class ClientHandler implements Runnable {
 
@@ -58,12 +59,31 @@ public class ClientHandler implements Runnable {
         this.name = name;
         this.features = features;
         this.state = ClientState.IDENTIFIED;
-        Logger.info(String.format("Client %s identified as %s", socket.getInetAddress(), getName()));
+        Logger.info(String.format("Client %s identified as %s with %s", socket.getInetAddress(), getName(), getFeatures().size() > 0 ? getFeatures() : "no features"));
         writePacket(ServerProtocol.identify());
     }
 
-    public void queue() throws IllegalStateException {
-        if (state != ClientState.IDENTIFIED && state != ClientState.QUEUED) throw new IllegalStateException();
+    public void queue(List<Integer> queues) throws IllegalStateException, IllegalQueueException {
+        if (state != ClientState.IDENTIFIED) throw new IllegalStateException();
+        for (int i : queues) {
+            PlayerList.addPlayerToQueue(this, i);
+        }
+        this.state = ClientState.QUEUED;
+        Logger.info(String.format("Player %s queued for %s", getName(), queues.toString()));
+        writePacket(ServerProtocol.queue(queues));
+        PlayerList.checkQueues();
+    }
+
+    public void gameStart(List<String> players) {
+        this.state = ClientState.GAME_WAITING;
+        Logger.info(String.format("Player %s started a game", getName()));
+        writePacket(ServerProtocol.gameStart(players));
+    }
+
+    public void gameEnd(Map<String, Integer> playerScores) {
+        this.state = ClientState.IDENTIFIED;
+        Logger.info(String.format("Player %s ended their game", getName()));
+        writePacket(ServerProtocol.gameEnd(playerScores));
     }
 
     public void chat(String recipient, String message) throws IllegalStateException {
@@ -89,9 +109,12 @@ public class ClientHandler implements Runnable {
         while (!closed) {
             try {
                 String packet = in.readLine();
-                if (packet == null) disconnect();
-                Logger.debug(String.format("[<-%s] %s", getName(), packet));
-                parsePacket(packet);
+                if (packet != null) {
+                    Logger.debug(String.format("[<-%s] %s", getName(), packet));
+                    parsePacket(packet);
+                } else {
+                    disconnect();
+                }
             } catch (IOException e) {
                 Logger.error(e);
                 disconnect();

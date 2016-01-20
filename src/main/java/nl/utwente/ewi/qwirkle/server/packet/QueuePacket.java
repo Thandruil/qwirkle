@@ -14,6 +14,6 @@ public class QueuePacket implements IPacket {
     }
 
     public void process(ClientHandler client) throws QwirkleException, IllegalStateException {
-
+        client.queue(queues);
     }
 }
