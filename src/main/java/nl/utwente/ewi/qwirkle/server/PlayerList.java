@@ -19,11 +19,10 @@ public class PlayerList {
         queueMap.put(3, new GameQueue(3));
         queueMap.put(4, new GameQueue(4));
         gameList = Collections.synchronizedList(new LinkedList<>());
-        playerCount = 0;
     }
 
     public static int getPlayerCount() {
-        return playerCount;
+        return playerMap.size();
     }
 
     public static Map<String, ClientHandler> getPlayerList() {
@@ -34,7 +33,6 @@ public class PlayerList {
         if (name == null || !name.matches("^[A-Za-z0-9-_]{2,16}$")) throw new IllegalNameException();
         if (playerMap.containsKey(name)) throw new NonUniqueNameException();
         playerMap.put(name, client);
-        playerCount++;
     }
 
     public static synchronized void addPlayerToQueue(ClientHandler client, int queue) throws IllegalQueueException {
@@ -43,8 +41,7 @@ public class PlayerList {
     }
 
     public static synchronized void removePlayer(String name) {
-        playerMap.remove(name);
-        playerCount--;
+        if (playerMap.containsKey(name)) playerMap.remove(name);
     }
 
     public static synchronized void removePlayerFromQueue(String name, int queue) {
