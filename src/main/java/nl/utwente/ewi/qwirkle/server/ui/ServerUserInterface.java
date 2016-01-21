@@ -1,7 +1,7 @@
 package nl.utwente.ewi.qwirkle.server.ui;
 
 import nl.utwente.ewi.qwirkle.server.ClientHandler;
-import nl.utwente.ewi.qwirkle.server.PlayerList;
+import nl.utwente.ewi.qwirkle.server.model.PlayerList;
 import nl.utwente.ewi.qwirkle.util.Logger;
 import nl.utwente.ewi.qwirkle.util.TextAreaOutputStream;
 

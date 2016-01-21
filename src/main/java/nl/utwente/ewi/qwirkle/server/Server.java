@@ -12,7 +12,7 @@ import java.net.Socket;
 
 public class Server implements Runnable {
 
-    public static final int MIN_PORT = 2014;
+    public static final int MIN_PORT = 1024;
     public static final int MAX_PORT = 65536;
 
     boolean running = true;
