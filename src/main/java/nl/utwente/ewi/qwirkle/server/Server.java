@@ -5,9 +5,9 @@ import nl.utwente.ewi.qwirkle.server.ui.ServerUserInterface;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Scanner;
 
 public class Server implements Runnable {
 
@@ -44,7 +44,17 @@ public class Server implements Runnable {
                 server = new ServerSocket(port);
                 ui.setStatus(true);
                 ui.setPort(Integer.toString(port));
-                ui.setIp("xxx.xxx.xxx.xxx");
+                ui.setIp("");
+                // TODO: 21-1-16 Implement IP 
+                // TODO: 21-1-16 Mooier maken...? 
+                new Thread(() -> {
+                    while (true) {
+                        ui.updateClients();
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {}
+                    }
+                }).start();
             } catch (IOException e) {
                 Logger.error("Failed to bind to port!", e);
                 server = null;
