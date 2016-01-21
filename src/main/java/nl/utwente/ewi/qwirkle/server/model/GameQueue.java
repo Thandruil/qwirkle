@@ -1,4 +1,4 @@
-package nl.utwente.ewi.qwirkle.server;
+package nl.utwente.ewi.qwirkle.server.model;
 
 import java.util.ArrayList;
 import java.util.Collections;

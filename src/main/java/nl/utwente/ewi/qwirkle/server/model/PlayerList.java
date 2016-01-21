@@ -1,5 +1,6 @@
-package nl.utwente.ewi.qwirkle.server;
+package nl.utwente.ewi.qwirkle.server.model;
 
+import nl.utwente.ewi.qwirkle.server.*;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.*;
@@ -10,7 +11,6 @@ public class PlayerList {
     private static Map<String, ClientHandler> playerMap;
     private static Map<Integer, GameQueue> queueMap;
     private static List<Game> gameList;
-    private static int playerCount;
 
     public PlayerList() {
         playerMap = new ConcurrentHashMap<>();
@@ -41,6 +41,7 @@ public class PlayerList {
     }
 
     public static synchronized void removePlayer(String name) {
+        removePlayerFromAllQueues(name);
         if (playerMap.containsKey(name)) playerMap.remove(name);
     }
 
@@ -56,7 +57,7 @@ public class PlayerList {
 
     public static synchronized void checkQueues() {
         Logger.info("Checking for possible games");
-        for (int i = 4; i > 1; i--) {
+        for (int i = queueMap.size() + 1; i > 1; i--) {
             GameQueue queue = queueMap.get(i);
             if (queue.ready()) {
                 List<String> players = queue.getPlayers();
@@ -70,5 +71,11 @@ public class PlayerList {
     public static synchronized void newGame(List<String> players) {
         Game game = new Game(players.stream().map(p -> playerMap.get(p)).collect(Collectors.toList()));
         gameList.add(game);
+        game.start();
+    }
+
+    public static synchronized void stopGame(Game game) {
+        game.end();
+        gameList.remove(game);
     }
 }
