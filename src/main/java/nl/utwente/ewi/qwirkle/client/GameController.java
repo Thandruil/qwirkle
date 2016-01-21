@@ -1,6 +1,6 @@
 package nl.utwente.ewi.qwirkle.client;
 
-import nl.utwente.ewi.qwirkle.client.UI.IUserInterface;
+import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.model.*;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
@@ -31,7 +31,7 @@ public class GameController {
             } else {
                 size = playerList.size();
             }
-            throw new PlayerAmountInvalidException(String.format("The player amount %d is not between %d and %d, or is null, or no UI is given.", size, MIN_PLAYERS, MAX_PLAYERS));
+            throw new PlayerAmountInvalidException(String.format("The player amount %d is not between %d and %d, or is null, or no ui is given.", size, MIN_PLAYERS, MAX_PLAYERS));
         }
     }
 

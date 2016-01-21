@@ -1,7 +1,7 @@
 package nl.utwente.ewi.qwirkle.client;
 
-import nl.utwente.ewi.qwirkle.client.UI.IUserInterface;
-import nl.utwente.ewi.qwirkle.client.UI.TextUserInterface;
+import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
+import nl.utwente.ewi.qwirkle.client.ui.TextUserInterface;
 import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
 import nl.utwente.ewi.qwirkle.util.Logger;
@@ -50,9 +50,9 @@ public class Client implements Runnable {
                 break;
             case ONLINE:
                 Logger.info("Online game has been chosen.");
-                // Wacht op keuze UI: Server en port
+                // Wacht op keuze ui: Server en port
                 // Check op server
-                // Wacht op keuze UI: Gebruikersnaam en speler type
+                // Wacht op keuze ui: Gebruikersnaam en speler type
                 // Check op gebruikersnaam
                 // Wacht op game
                 // Start game

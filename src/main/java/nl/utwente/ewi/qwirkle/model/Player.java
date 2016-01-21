@@ -1,6 +1,6 @@
 package nl.utwente.ewi.qwirkle.model;
 
-import nl.utwente.ewi.qwirkle.client.UI.IUserInterface;
+import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.*;

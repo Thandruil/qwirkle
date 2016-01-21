@@ -1,4 +1,4 @@
-package nl.utwente.ewi.qwirkle.client.UI;
+package nl.utwente.ewi.qwirkle.client.ui;
 
 import nl.utwente.ewi.qwirkle.client.Client;
 import nl.utwente.ewi.qwirkle.client.GameController;

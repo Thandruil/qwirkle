@@ -1,4 +1,4 @@
-package nl.utwente.ewi.qwirkle.client.UI;
+package nl.utwente.ewi.qwirkle.client.ui;
 
 import nl.utwente.ewi.qwirkle.client.Client;
 import nl.utwente.ewi.qwirkle.client.GameController;
@@ -10,7 +10,6 @@ import nl.utwente.ewi.qwirkle.model.Tile;
 import java.util.List;
 import java.util.Map;
 import java.util.Observer;
-import java.util.Set;
 
 public interface IUserInterface extends Observer {
     void init();
