@@ -1,5 +1,6 @@
 package nl.utwente.ewi.qwirkle.server;
 
+import nl.utwente.ewi.qwirkle.server.model.PlayerList;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class Server implements Runnable {
             Scanner in = new Scanner(System.in);
             try {
                 port = in.nextInt();
-                Logger.info("Starting Qwirkle server on *:" + port);
+                Logger.info(String.format("Starting Qwirkle server on *:%d", port));
                 server = new ServerSocket(port);
             } catch (IOException e) {
                 Logger.error("Failed to bind to port!", e);
