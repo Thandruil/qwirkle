@@ -33,7 +33,7 @@ public class ServerProtocol implements IProtocol {
     }
 
     public static String gameEnd(Map<String, Integer> playerScores) {
-        return String.format("%s %s", IProtocol.SERVER_GAMEEND, playerScores.keySet().stream().map(p -> p + playerScores.get(p)).collect(Collectors.joining(" ")));
+        return String.format("%s %s", IProtocol.SERVER_GAMEEND, playerScores.keySet().stream().map(p -> p + "," + playerScores.get(p)).collect(Collectors.joining(" ")));
     }
 
     public static String turn(String player) {
