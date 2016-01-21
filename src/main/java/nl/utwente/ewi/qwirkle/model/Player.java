@@ -1,22 +1,10 @@
 package nl.utwente.ewi.qwirkle.model;
 
-import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
-import nl.utwente.ewi.qwirkle.util.Logger;
-
 import java.util.*;
 
 public abstract class Player {
 
     public final static String NAME_REGEX = "^[A-Za-z0-9_-]{2,16}$";
-
-    public enum STATES {
-        NOTHING,        // The player is in the menu and is not linked to a game or server yet.
-        CONNECTED,      // The player wants to play online and is connected to a server.
-        JOINED,         // The player is playing online and joined a server successfully. The player is not in a game.
-        QUEUE,          // The player is playing online and in a matchmaking queue for a game.
-        GAME_WAITING,   // The player is in a game but waiting for the server or other players.
-        GAME_TURN       // The player is in a game and is on turn.
-    }
 
     private String name;
 
@@ -24,13 +12,10 @@ public abstract class Player {
 
     private int score;
 
-    protected IUserInterface ui;
-
-    public Player(IUserInterface ui, String name) throws PlayerNameInvalidException {
-        setName(name);
+    public Player(String name) {
+        this.name = name;
         this.hand = new ArrayList<>();
         this.score = 0;
-        this.ui = ui;
     }
 
     public void setName(String name) throws PlayerNameInvalidException {
@@ -62,9 +47,7 @@ public abstract class Player {
     }
 
     public void addTile(List<Tile> tileList) {
-        for (Tile t : tileList) {
-            addTile(t);
-        }
+        tileList.forEach(this::addTile);
     }
 
     public void removeTile(Tile tile) throws TileDoesNotExistException {
@@ -98,7 +81,6 @@ public abstract class Player {
     public int longestStreak() {
         int max = 1;
         Set<Tile> uniqueHand = new HashSet<>(getHand());
-        Logger.debug("Streak hand size: " + uniqueHand.size());
         for (Tile.Shape s : Tile.Shape.values()) {
             int i = 0;
             for (Tile t : uniqueHand) {

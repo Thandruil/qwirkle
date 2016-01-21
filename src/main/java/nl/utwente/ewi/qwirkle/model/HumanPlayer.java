@@ -6,8 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 public class HumanPlayer extends Player {
+
+    private IUserInterface ui;
+
     public HumanPlayer(IUserInterface ui, String name) throws PlayerNameInvalidException {
-        super(ui, name);
+        super(name);
+        super.setName(name);
+        this.ui = ui;
     }
 
     @Override

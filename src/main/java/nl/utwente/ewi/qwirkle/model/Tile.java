@@ -102,6 +102,15 @@ public class Tile {
 
     @Override
     public int hashCode() {
-        return getColor().hashCode() * 31 + getShape().hashCode();
+        return getColor().ordinal() * 6 + getShape().ordinal();
+    }
+
+    public static Tile parseTile(int i) {
+        if (i >= 0 && i < Shape.values().length * Color.values().length) {
+            Shape s = Shape.values()[i % Shape.values().length];
+            Color c = Color.values()[i / Color.values().length];
+            return new Tile(s, c);
+        }
+        return null;
     }
 }

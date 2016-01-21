@@ -2,6 +2,7 @@ package nl.utwente.ewi.qwirkle.server;
 
 import nl.utwente.ewi.qwirkle.server.ui.ChoosePort;
 import nl.utwente.ewi.qwirkle.server.ui.ServerUserInterface;
+import nl.utwente.ewi.qwirkle.server.model.PlayerList;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class Server implements Runnable {
             port = cp.getPort();
             ui = new ServerUserInterface();
             try {
-                Logger.info("Starting Qwirkle server on *:" + port);
+                Logger.info(String.format("Starting Qwirkle server on *:%d", port));
                 server = new ServerSocket(port);
                 ui.setStatus(true);
                 ui.setPort(Integer.toString(port));
