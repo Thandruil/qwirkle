@@ -1,16 +1,22 @@
 package nl.utwente.ewi.qwirkle.server;
 
+import nl.utwente.ewi.qwirkle.model.Coordinate;
+import nl.utwente.ewi.qwirkle.model.Tile;
 import nl.utwente.ewi.qwirkle.net.IProtocol;
 import nl.utwente.ewi.qwirkle.net.IllegalStateException;
 import nl.utwente.ewi.qwirkle.net.ProtocolException;
 import nl.utwente.ewi.qwirkle.net.ServerProtocol;
+import nl.utwente.ewi.qwirkle.server.model.Game;
+import nl.utwente.ewi.qwirkle.server.model.PlayerList;
 import nl.utwente.ewi.qwirkle.server.packet.IPacket;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.io.*;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ClientHandler implements Runnable {
 
@@ -30,6 +36,8 @@ public class ClientHandler implements Runnable {
 
     private ClientState state;
 
+    private Game game;
+
     private String name;
     private List<IProtocol.Feature> features;
 
@@ -38,6 +46,7 @@ public class ClientHandler implements Runnable {
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
         this.state = ClientState.CONNECTED;
+        this.game = null;
         this.closed = false;
     }
 
@@ -74,16 +83,19 @@ public class ClientHandler implements Runnable {
         PlayerList.checkQueues();
     }
 
-    public void gameStart(List<String> players) {
-        this.state = ClientState.GAME_WAITING;
-        Logger.info(String.format("Player %s started a game", getName()));
-        writePacket(ServerProtocol.gameStart(players));
+    public void movePut(Map<Coordinate, Tile> moves) throws IllegalStateException, IllegalMoveException, TilesNotOwnedException {
+        if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
+        int score = game.doMove(moves);
+        Logger.info(String.format("Player %s moved %d tiles for %d points", getName(), moves.size(), score));
+        game.next();
+
     }
 
-    public void gameEnd(Map<String, Integer> playerScores) {
-        this.state = ClientState.IDENTIFIED;
-        Logger.info(String.format("Player %s ended their game", getName()));
-        writePacket(ServerProtocol.gameEnd(playerScores));
+    public void moveTrade(List<Tile> tiles) throws IllegalStateException, TilesNotOwnedException {
+        if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
+        game.doTrade(tiles);
+        Logger.info(String.format("Player %s traded %d tiles", getName(), tiles.size()));
+        game.next();
     }
 
     public void chat(String recipient, String message) throws IllegalStateException {
@@ -103,6 +115,57 @@ public class ClientHandler implements Runnable {
             if ((client = PlayerList.getPlayerList().get(recipient.substring(1))) != null && client.getFeatures().contains(IProtocol.Feature.CHAT))
                 client.writePacket(ServerProtocol.chat(recipient, getName(), message));
         }
+    }
+
+    public void lobby() {
+        List<String> players = PlayerList.getPlayerList().values().stream()
+                .filter(p -> p.getState() != ClientState.CONNECTED)
+                .map(ClientHandler::getName)
+                .collect(Collectors.toList());
+        Logger.info(String.format("Player %s requested the lobby", getName()));
+        writePacket(ServerProtocol.lobby(players));
+    }
+
+    public void sendGameStart(Game game, Collection<String> players) {
+        this.game = game;
+        this.state = ClientState.GAME_WAITING;
+        Logger.info(String.format("Player %s started a game", getName()));
+        writePacket(ServerProtocol.gameStart(players));
+    }
+
+    public void gameEnd(Map<String, Integer> playerScores) {
+        this.game = null;
+        this.state = ClientState.IDENTIFIED;
+        Logger.info(String.format("Player %s ended their game", getName()));
+        writePacket(ServerProtocol.gameEnd(playerScores));
+    }
+
+    public void sendTurn(String player) {
+        if (player.equals(name)) {
+            this.state = ClientState.GAME_TURN;
+            Logger.info(String.format("Player %ss turn", getName()));
+        }
+        writePacket(ServerProtocol.turn(player));
+    }
+
+    public void sendPass(String player) {
+        if (player.equals(name)) {
+            Logger.info(String.format("Player %s skipped", getName()));
+        }
+        writePacket(ServerProtocol.turn(player));
+    }
+
+    public void sendMovePut(Map<Coordinate, Tile> moves) {
+        writePacket(ServerProtocol.movePut(moves));
+    }
+
+    public void sendMoveTrade(int amount) {
+        writePacket(ServerProtocol.moveTrade(amount));
+    }
+
+    public void drawTile(List<Tile> tiles) {
+        Logger.info(String.format("Player %s drew %d tiles", getName(), tiles.size()));
+        writePacket(ServerProtocol.drawTile(tiles));
     }
 
     public void run() {
@@ -125,7 +188,8 @@ public class ClientHandler implements Runnable {
     public void disconnect() {
         if (closed) return;
         Logger.info(String.format("Disconnecting %s", getName()));
-        PlayerList.removePlayer(name);
+        if (game != null) PlayerList.stopGame(game);
+        PlayerList.removePlayer(getName());
         try {
             in.close();
         } catch (IOException e) {
