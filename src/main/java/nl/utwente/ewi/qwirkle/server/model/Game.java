@@ -117,6 +117,14 @@ public class Game {
         }
         int score = board.doMove(moves);
         if (score == 0) throw new IllegalMoveException();
+
+        for (Tile tile : moves.values()) {
+            try {
+                getCurrentPlayer().removeTile(tile);
+            } catch (TileDoesNotExistException e) {
+                Logger.fatal(e);
+            }
+        }
         sendMovePut(moves);
         return score;
     }
@@ -124,6 +132,15 @@ public class Game {
     public void doTrade(List<Tile> tiles) throws TilesNotOwnedException {
         for (Tile tile : tiles) {
             if (!getCurrentPlayer().getHand().contains(tile)) throw new TilesNotOwnedException();
+        }
+
+        for (Tile tile : tiles) {
+            try {
+                getCurrentPlayer().removeTile(tile);
+            } catch (TileDoesNotExistException e) {
+                Logger.fatal(e);
+            }
+            deck.addTile(tile);
         }
         sendMoveTrade(tiles.size());
     }

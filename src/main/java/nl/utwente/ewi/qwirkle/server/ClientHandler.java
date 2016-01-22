@@ -2,20 +2,17 @@ package nl.utwente.ewi.qwirkle.server;
 
 import nl.utwente.ewi.qwirkle.model.Coordinate;
 import nl.utwente.ewi.qwirkle.model.Tile;
-import nl.utwente.ewi.qwirkle.net.IProtocol;
+import nl.utwente.ewi.qwirkle.net.*;
 import nl.utwente.ewi.qwirkle.net.IllegalStateException;
-import nl.utwente.ewi.qwirkle.net.ProtocolException;
-import nl.utwente.ewi.qwirkle.net.ServerProtocol;
 import nl.utwente.ewi.qwirkle.server.model.Game;
 import nl.utwente.ewi.qwirkle.server.model.PlayerList;
-import nl.utwente.ewi.qwirkle.server.packet.IPacket;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ClientHandler implements Runnable {
@@ -220,8 +217,110 @@ public class ClientHandler implements Runnable {
 
     private void parsePacket(String message) {
         try {
-            IPacket parsedPacket = ServerProtocol.parsePacket(message);
-            parsedPacket.process(this);
+            String[] packetWords = message.split(" ");
+            String command = packetWords[0];
+            String[] args = new String[packetWords.length - 1];
+            System.arraycopy(packetWords, 1, args, 0, packetWords.length - 1);
+            switch (command) {
+                case ServerProtocol.CLIENT_IDENTIFY:
+                    if (args.length > 0 && args[0].matches(ServerProtocol.NAME_REGEX)) {
+                        String name = args[0];
+                        if (args.length == 1) identify(name, new ArrayList<>());
+                        if (args.length == 2 && args[1].matches(ServerProtocol.LIST_REGEX)) {
+                            List<IProtocol.Feature> features = new ArrayList<>();
+                            for (String f : args[1].split(","))
+                                try {
+                                    features.add(IProtocol.Feature.valueOf(f));
+                                } catch (IllegalArgumentException e) {
+                                    throw new IllegalParameterException();
+                                }
+                            identify(name, features);
+                        }
+                    } else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_QUIT:
+                    break;
+                case ServerProtocol.CLIENT_QUEUE:
+                    if (args.length == 1 && args[0].matches(ServerProtocol.LIST_REGEX)) {
+                        List<Integer> queues = new ArrayList<>();
+                        for (String q : args[0].split(",")) {
+                            try {
+                                queues.add(Integer.parseInt(q));
+                            } catch (NumberFormatException e) {
+                                throw new IllegalParameterException();
+                            }
+                        }
+                        queue(queues);
+                    } else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_MOVE_PUT:
+                    if (args.length >= 1 && args.length <= 6) {
+                        Pattern p = Pattern.compile("^(\\d+)@(-?\\d+),(-?\\d+)$");
+                        Map<Coordinate, Tile> moves = new HashMap<>();
+                        for (String m : args) {
+                            Logger.debug(m);
+                            Matcher matcher = p.matcher(m);
+                            if (matcher.find()) {
+                                try {
+                                    int t = Integer.parseInt(matcher.group(1));
+                                    int x = Integer.parseInt(matcher.group(2));
+                                    int y = Integer.parseInt(matcher.group(3));
+                                    moves.put(new Coordinate(x, y), Tile.parseTile(t));
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                    throw new IllegalParameterException();
+                                }
+                            } else {
+                                throw new IllegalParameterException();
+                            }
+                        }
+                        movePut(moves);
+                    }
+                    else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_MOVE_TRADE:
+                    if (args.length >= 1 && args.length <= 6) {
+                        List<Tile> tiles = new ArrayList<>();
+                        for (String m : args) {
+                            try {
+                                tiles.add(Tile.parseTile(Integer.parseInt(m)));
+                            } catch (NumberFormatException e) {
+                                throw new IllegalParameterException();
+                            }
+                        }
+                        moveTrade(tiles);
+                    }
+                    else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_CHAT:
+                    if (args.length > 1) {
+                        String recipent = args[0];
+                        String[] chatMessage = new String[args.length - 1];
+                        System.arraycopy(args, 1, chatMessage, 0, args.length - 1);
+                        chat(recipent, String.join(" ", chatMessage));
+                    }
+                    else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_CHALLENGE:
+                    if (args.length == 1) ;
+                    else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_CHALLENGE_ACCEPT:
+                    if (args.length == 1) ;
+                    else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_CHALLENGE_DECLINE:
+                    if (args.length == 1) ;
+                    else throw new IllegalParameterException();
+                    break;
+                case ServerProtocol.CLIENT_LEADERBOARD:
+                    break;
+                case ServerProtocol.CLIENT_LOBBY:
+                    lobby();
+                    break;
+                default:
+                    throw new IllegalCommandException();
+            }
         } catch (ProtocolException e) {
             Logger.fatal(e);
             writePacket(ServerProtocol.error(e.getError()));
