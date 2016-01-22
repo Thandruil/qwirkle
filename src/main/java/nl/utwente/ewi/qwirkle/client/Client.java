@@ -4,6 +4,8 @@ import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.client.ui.TextUserInterface;
 import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
+import nl.utwente.ewi.qwirkle.server.Server;
+import nl.utwente.ewi.qwirkle.util.Extra;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.List;
@@ -50,6 +52,11 @@ public class Client implements Runnable {
                 break;
             case ONLINE:
                 Logger.info("Online game has been chosen.");
+                String[] server;
+                do {
+                    server = ui.selectServer();
+                } while(server.length != 2 || !Extra.isInteger(server[1]) || Integer.parseInt(server[1]) < Server.MIN_PORT || Integer.parseInt(server[1]) > Server.MAX_PORT);
+
                 // Wacht op keuze ui: Server en port
                 // Check op server
                 // Wacht op keuze ui: Gebruikersnaam en speler type

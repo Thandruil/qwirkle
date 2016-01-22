@@ -16,6 +16,7 @@ public interface IUserInterface extends Observer {
 
     Client.GameType selectGameType();
     List<Player> selectPlayers();
+    String[] selectServer();
     void initGame(GameController game);
     void gameOver();
 

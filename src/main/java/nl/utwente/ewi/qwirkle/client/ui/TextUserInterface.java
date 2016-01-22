@@ -3,6 +3,7 @@ package nl.utwente.ewi.qwirkle.client.ui;
 import nl.utwente.ewi.qwirkle.client.Client;
 import nl.utwente.ewi.qwirkle.client.GameController;
 import nl.utwente.ewi.qwirkle.model.*;
+import nl.utwente.ewi.qwirkle.server.Server;
 import nl.utwente.ewi.qwirkle.util.Extra;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
@@ -95,6 +96,20 @@ public class TextUserInterface implements IUserInterface {
             }
         }
         return players;
+    }
+
+    @Override
+    public String[] selectServer() {
+        String[] server;
+        do {
+            clear();
+            System.out.println("Please choose a server.");
+            System.out.println("");
+            System.out.println("Example: 127.0.0.1:5555");
+            System.out.println("");
+            server = scanner.nextLine().split(":");
+        } while (server.length != 2 || !Extra.isInteger(server[1]) || Integer.parseInt(server[1]) < Server.MIN_PORT || Integer.parseInt(server[1]) > Server.MAX_PORT);
+        return server;
     }
 
     @Override

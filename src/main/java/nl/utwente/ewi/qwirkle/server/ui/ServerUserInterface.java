@@ -11,7 +11,6 @@ import java.awt.*;
 public class ServerUserInterface extends JFrame {
     private JPanel mainPanel;
     private JPanel leftPanel;
-    private JPanel midPanel;
     private JPanel rightPanel;
 
     private JLabel statusText;
@@ -29,7 +28,6 @@ public class ServerUserInterface extends JFrame {
         mainPanel = new JPanel(new GridLayout(1,3));
         leftPanel = new JPanel();
         leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        midPanel = new JPanel();
         rightPanel = new JPanel();
         rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
 
@@ -68,7 +66,6 @@ public class ServerUserInterface extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.add(mainPanel);
         mainPanel.add(leftPanel);
-        //mainPanel.add(midPanel);
         mainPanel.add(logArea);
         mainPanel.add(rightPanel);
         pack();
