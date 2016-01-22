@@ -179,7 +179,7 @@ public class TextUserInterface implements IUserInterface {
     public class DescScoreComparator implements Comparator<Player> {
         @Override
         public int compare(Player player, Player t1) {
-            return Math.min(0, t1.getScore()) - Math.min(0, player.getScore());
+            return t1.getScore() - player.getScore();
         }
     }
 
