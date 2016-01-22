@@ -1,8 +1,13 @@
 package nl.utwente.ewi.qwirkle.model;
 
+import nl.utwente.ewi.qwirkle.client.GameController;
+
 import java.util.*;
 
 public abstract class Player {
+
+
+    private GameController gc;
 
     // TODO: 22-1-16 REPLACE THIS WITH THE ONE IN IPROTOCOL
     public final static String NAME_REGEX = "^[A-Za-z0-9_-]{2,16}$";
@@ -40,7 +45,7 @@ public abstract class Player {
     }
 
     public List<Tile> getHand() {
-        return this.hand;
+        return new ArrayList<>(this.hand);
     }
 
     public void addTile(Tile tile) {
@@ -109,5 +114,13 @@ public abstract class Player {
             }
         }
         return max;
+    }
+
+    public void setGameController(GameController gc) {
+        this.gc = gc;
+    }
+
+    protected GameController getGameController() {
+        return this.gc;
     }
 }
