@@ -24,43 +24,4 @@ public class ClientProtocol implements IProtocol {
     public static String lobby() {
         return String.format("%s", IProtocol.SERVER_LOBBY);
     }
-
-    // TODO: 21/01/16 Andere return value?
-    public static void parsePacket(String message) throws ProtocolException {
-        String[] packetWords = message.split(" ");
-        String command = packetWords[0];
-        String[] args = new String[packetWords.length - 1];
-        System.arraycopy(packetWords, 1, args, 0, packetWords.length - 1);
-        IPacket packet = null;
-        switch (command) {
-            case SERVER_IDENTIFY:
-                break;
-            case SERVER_QUEUE:
-                break;
-            case SERVER_GAMESTART:
-                break;
-            case SERVER_GAMEEND:
-                break;
-            case SERVER_TURN:
-                break;
-            case SERVER_PASS:
-                break;
-            case SERVER_DRAWTILE:
-                break;
-            case SERVER_MOVE_PUT:
-                break;
-            case SERVER_MOVE_TRADE:
-                break;
-            case SERVER_CHAT:
-                break;
-            case SERVER_LEADERBOARD:
-                break;
-            case SERVER_LOBBY:
-                break;
-            case SERVER_ERROR:
-                break;
-            default:
-                throw new IllegalCommandException();
-        }
-    }
 }

@@ -71,31 +71,41 @@ public class TextUserInterface implements IUserInterface {
         } while (playercount < GameController.MIN_PLAYERS || playercount > GameController.MAX_PLAYERS);
         List<Player> players = new ArrayList<>();
         for (int i = 1; i <= playercount; i++) {
-            int type;
-            do {
-                clear();
-                System.out.println("Please choose a player type for player " + i + ".");
-                System.out.println("");
-                System.out.println("1 = Human player");
-                System.out.println("");
-                type = getInt();
-            } while (type < 1 || type > 1);
-            String name;
-            do {
-                clear();
-                System.out.println("Please choose a name for player " + i + ".");
-                System.out.println("");
-                name = scanner.nextLine();
-            } while (!name.matches(Player.NAME_REGEX));
-            try {
-                Player p = new HumanPlayer(this, name);
-                players.add(p);
-            } catch (PlayerNameInvalidException e1) {
-                Logger.fatal("Error: Name check does not work.");
-                e1.printStackTrace();
-            }
+            players.add(selectPlayer("Choosing player " + i + "."));
         }
         return players;
+    }
+
+    @Override
+    public Player selectPlayer(String t) {
+        int type;
+        do {
+            clear();
+            System.out.println(t);
+            System.out.println("");
+            System.out.println("Please choose a player type.");
+            System.out.println("");
+            System.out.println("1 = Human player");
+            System.out.println("");
+            type = getInt();
+        } while (type < 1 || type > 1);
+        String name;
+        do {
+            clear();
+            System.out.println(t);
+            System.out.println("");
+            System.out.println("Please choose a name.");
+            System.out.println("");
+            name = scanner.nextLine();
+        } while (!name.matches(Player.NAME_REGEX));
+        try {
+            Player p = new HumanPlayer(this, name);
+            return p;
+        } catch (PlayerNameInvalidException e1) {
+            Logger.fatal("Error: Name check does not work.");
+            e1.printStackTrace();
+        }
+        return null;
     }
 
     @Override

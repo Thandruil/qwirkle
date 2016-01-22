@@ -4,6 +4,7 @@ import java.util.*;
 
 public abstract class Player {
 
+    // TODO: 22-1-16 REPLACE THIS WITH THE ONE IN IPROTOCOL
     public final static String NAME_REGEX = "^[A-Za-z0-9_-]{2,16}$";
 
     private String name;

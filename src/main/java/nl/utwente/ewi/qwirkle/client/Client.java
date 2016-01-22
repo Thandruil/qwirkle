@@ -4,10 +4,13 @@ import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.client.ui.TextUserInterface;
 import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
+import nl.utwente.ewi.qwirkle.net.ClientProtocol;
 import nl.utwente.ewi.qwirkle.server.Server;
 import nl.utwente.ewi.qwirkle.util.Extra;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
+import java.io.IOException;
+import java.net.Socket;
 import java.util.List;
 
 public class Client implements Runnable {
@@ -53,16 +56,46 @@ public class Client implements Runnable {
             case ONLINE:
                 Logger.info("Online game has been chosen.");
                 String[] server;
+                Socket sock;
                 do {
-                    server = ui.selectServer();
-                } while(server.length != 2 || !Extra.isInteger(server[1]) || Integer.parseInt(server[1]) < Server.MIN_PORT || Integer.parseInt(server[1]) > Server.MAX_PORT);
+                    do {
+                        server = ui.selectServer();
+                    }
+                    while (server.length != 2 || !Extra.isInteger(server[1]) || Integer.parseInt(server[1]) < Server.MIN_PORT || Integer.parseInt(server[1]) > Server.MAX_PORT);
+                    try {
+                        sock = new Socket(server[0], Integer.parseInt(server[1]));
+                        Logger.info("Connected to " + server[0] + ":" + server[1]);
+                    } catch (java.io.IOException e) {
+                        Logger.info("Can not connect to " + server[0] + ":" + server[1]);
+                        sock = null;
+                    }
+                } while(sock == null);
+                Logger.info("Connection running . . .");
+                //do {
+                    Player p;
+                    do {
+                        p = ui.selectPlayer("");
+                    } while (p == null);
+                    ServerHandler sh;
+                    try {
+                        sh = new ServerHandler(sock);
 
-                // Wacht op keuze ui: Server en port
-                // Check op server
-                // Wacht op keuze ui: Gebruikersnaam en speler type
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                //} while();
+
                 // Check op gebruikersnaam
                 // Wacht op game
                 // Start game
+
+                Logger.info("Closing connection . . .");
+                try {
+                    sock.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Logger.info("Connection closed.");
                 break;
         }
     }
