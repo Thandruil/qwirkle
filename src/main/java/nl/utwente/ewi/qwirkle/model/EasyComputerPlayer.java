@@ -49,9 +49,11 @@ public class EasyComputerPlayer extends Player {
                     Map<Coordinate, Tile> tmpMove = new HashMap<>();
                     tmpMove.put(c, t);
 
-                    if (tmpBoard.doMove(tmpMove) > 0) {
+                    if (tmpBoard.validateMove(tmpMove)) {
+                        tmpBoard.put(c, t);
+
                         //Get other moves
-                        Set<Map<Coordinate, Tile>> tmpMap = getPossibleMoves(tmpBoard, tmpHand);
+                        Set<Map<Coordinate, Tile>> tmpMap = getPossibleMoves(tmpBoard, tmpHand, c);
 
                         ret.add(tmpMove);
                         for (Map<Coordinate, Tile> move : tmpMap) {
@@ -77,6 +79,7 @@ public class EasyComputerPlayer extends Player {
                 if (s == currentScore) {
                     ret.add(move);
                 } else if(s > currentScore) {
+                    currentScore = s;
                     ret.clear();
                     ret.add(move);
                 }

@@ -27,9 +27,9 @@ public class Ai {
             for (int y = boundaries[2] - 1; y <= boundaries[0] + 1; y++) {
                 Map<Coordinate, Tile> tmpMove = new HashMap<>();
                 tmpMove.put(new Coordinate(x, y), t);
-                if (b.validateMove(tmpMove)) {
+                //if (b.validateMove(tmpMove)) {
                     ret.add(new Coordinate(x, y));
-                }
+                //}
             }
         }
         return ret;
