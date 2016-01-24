@@ -1,6 +1,7 @@
 package nl.utwente.ewi.qwirkle.model;
 
 import nl.utwente.ewi.qwirkle.client.GameController;
+import nl.utwente.ewi.qwirkle.util.Ai;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.*;
@@ -20,13 +21,7 @@ public class DumbComputerPlayer extends Player {
 
     @Override
     public List<Tile> getTradeMove() {
-        int swap = rand.nextInt(getHand().size()) + 1;
-        List<Tile> ret = getHand();
-        Collections.shuffle(ret);
-        for (int i = getHand().size(); i > swap; i--) {
-            ret.remove(0);
-        }
-        return ret;
+        return Ai.randomTrade(getHand());
     }
 
     @Override

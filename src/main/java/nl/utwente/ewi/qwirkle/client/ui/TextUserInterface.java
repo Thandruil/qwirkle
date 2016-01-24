@@ -87,10 +87,11 @@ public class TextUserInterface implements IUserInterface {
             System.out.println("");
             System.out.println("1 = Human player");
             System.out.println("");
-            System.out.println("2 = Dump Computer");
+            System.out.println("2 = Dumb Computer");
+            System.out.println("3 = Easy Computer");
             System.out.println("");
             type = getInt();
-        } while (type < 1 || type > 2);
+        } while (type < 1 || type > 3);
         String name;
         do {
             clear();
@@ -106,6 +107,8 @@ public class TextUserInterface implements IUserInterface {
                     return new HumanPlayer(this, name);
                 case 2:
                     return new DumbComputerPlayer(name);
+                case 3:
+                    return new EasyComputerPlayer(name);
             }
         } catch (PlayerNameInvalidException e1) {
             Logger.fatal("Error: Name check does not work.");
