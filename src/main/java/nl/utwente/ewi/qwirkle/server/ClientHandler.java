@@ -67,6 +67,7 @@ public class ClientHandler implements Runnable {
         this.state = ClientState.IDENTIFIED;
         Logger.info(String.format("Client %s identified as %s with %s", socket.getInetAddress(), getName(), getFeatures().size() > 0 ? getFeatures() : "no features"));
         writePacket(ServerProtocol.identify());
+        PlayerList.updateLobby();
     }
 
     public void queue(List<Integer> queues) throws IllegalStateException, IllegalQueueException {
@@ -84,14 +85,15 @@ public class ClientHandler implements Runnable {
         if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
         int score = game.doMove(moves);
         Logger.info(String.format("Player %s moved %d tiles for %d points", getName(), moves.size(), score));
+        game.drawTiles();
         game.next();
-
     }
 
     public void moveTrade(List<Tile> tiles) throws IllegalStateException, TilesNotOwnedException {
         if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
         game.doTrade(tiles);
         Logger.info(String.format("Player %s traded %d tiles", getName(), tiles.size()));
+        game.drawTiles();
         game.next();
     }
 
@@ -187,6 +189,7 @@ public class ClientHandler implements Runnable {
         Logger.info(String.format("Disconnecting %s", getName()));
         if (game != null) PlayerList.stopGame(game);
         PlayerList.removePlayer(getName());
+        PlayerList.updateLobby();
         try {
             in.close();
         } catch (IOException e) {
