@@ -11,23 +11,40 @@ import java.util.*;
 
 public class TextUserInterface implements IUserInterface {
 
+    /**
+     * Amount of lines to be skipped in order to clear the terminal window.
+     */
     private static final int SKIP_LINES = 22;
 
+    /**
+     * The scanner for the user input.
+     */
     Scanner scanner;
 
+    /**
+     * A reference to the current game controller.
+     */
     GameController game;
 
+    /**
+     * This constructor created a scanner for the handling of user input.
+     */
     public TextUserInterface() {
         scanner = new Scanner(System.in);
     }
 
-    @Override
+    /**
+     * Initializes the TUI by clearing the screen and printing a message.
+     */
     public void init() {
         clear();
         System.out.println("TUI successfully initialized.");
     }
 
-    @Override
+    /**
+     * Asks the user what game type it wants to play. Local or online?
+     * @return A Client.GameType instance. Should be LOCAL or ONLINE.
+     */
     public Client.GameType selectGameType() {
         int choice;
         do {
@@ -35,24 +52,27 @@ public class TextUserInterface implements IUserInterface {
             System.out.println("Welcome to Qwirkle!");
             System.out.println("");
             System.out.println("1 = Play local against AI or your friends");
-            System.out.println("2 = Play online against friends or strangers");
             System.out.println("");
             System.out.println("0 = Exit game");
             System.out.println("");
             choice = getInt();
-        } while (choice < 0 || choice > 2);
+        } while (choice < 0 || choice > 1);
         if (choice == 1) {
             return Client.GameType.LOCAL;
         }
-        if (choice == 2) {
-            return Client.GameType.ONLINE;
-        }
+        //if (choice == 2) {
+        //    return Client.GameType.ONLINE;
+        //}
         if (choice == 0) {
             exit();
         }
         return null;
     }
 
+    /**
+     * Parses an integer as user input from the command line. This is a little more useful than the scanner function because it keeps asking for a number until a valid number is given.
+     * @return The parsed integer the user entered.
+     */
     private int getInt() {
         String nl;
         do {
@@ -61,7 +81,10 @@ public class TextUserInterface implements IUserInterface {
         return Integer.parseInt(nl);
     }
 
-    @Override
+    /**
+     * Asks the user with which players it wants to play a game. This could be Human players or for example Computer players.
+     * @return A list of the chosen players.
+     */
     public List<Player> selectPlayers() {
         int playercount;
         do {
@@ -76,7 +99,11 @@ public class TextUserInterface implements IUserInterface {
         return players;
     }
 
-    @Override
+    /**
+     * Asks the user to give a player type and name for a single player. This could be a Human player or for example a Computer player.
+     * @param t A string indicating what the player is choosing. This will be directly shown to the player. This is used when the player should choose for example four players, to indicate which player the user is choosing at the moment.
+     * @return The player object of the chosen player.
+     */
     public Player selectPlayer(String t) {
         int type;
         do {
@@ -87,8 +114,11 @@ public class TextUserInterface implements IUserInterface {
             System.out.println("");
             System.out.println("1 = Human player");
             System.out.println("");
+            System.out.println("2 = Dumb Computer");
+            System.out.println("3 = Easy Computer");
+            System.out.println("");
             type = getInt();
-        } while (type < 1 || type > 1);
+        } while (type < 1 || type > 3);
         String name;
         do {
             clear();
@@ -99,8 +129,14 @@ public class TextUserInterface implements IUserInterface {
             name = scanner.nextLine();
         } while (!name.matches(Player.NAME_REGEX));
         try {
-            Player p = new HumanPlayer(this, name);
-            return p;
+            switch(type) {
+                case 1:
+                    return new HumanPlayer(this, name);
+                case 2:
+                    return new DumbComputerPlayer(name);
+                case 3:
+                    return new EasyComputerPlayer(name);
+            }
         } catch (PlayerNameInvalidException e1) {
             Logger.fatal("Error: Name check does not work.");
             e1.printStackTrace();
@@ -108,7 +144,12 @@ public class TextUserInterface implements IUserInterface {
         return null;
     }
 
-    @Override
+    /**
+     * Asks the user what server and port to connect to.
+     * @deprecated The TUI will not support online games anymore. The GUI will.
+     * @return Returns a string array of length 2: the IP and the PORT.
+     */
+    @Deprecated
     public String[] selectServer() {
         String[] server;
         do {
@@ -122,13 +163,21 @@ public class TextUserInterface implements IUserInterface {
         return server;
     }
 
-    @Override
+    /**
+     * Initializes the TUI for playing the game. It saves the game controller, clears the window and draws the initial board.
+     * @param game The game controller controlling the game. This is so the TUI can read a copy of the board from this controller.
+     */
     public void initGame(GameController game) {
         this.game = game;
         clear();
         drawBoard(this.game.getCurrentPlayer());
     }
 
+    /**
+     * Draws the given board in the terminal window.
+     * @param p The player of who the tiles should be shown.
+     * @param b The board which should be displayed.
+     */
     private void drawBoard(Player p, Board b) {
         System.out.println("Tiles left in the deck: " + this.game.getDeckRemaining());
         for (Player player : this.game.getPlayers()) {
@@ -145,6 +194,10 @@ public class TextUserInterface implements IUserInterface {
         System.out.println("");
     }
 
+    /**
+     * Draws the board connected to the linked game controller in the attribute game.
+     * @param p The player of who the tiles should be shown.
+     */
     private void drawBoard(Player p) {
         if (this.game != null) {
             drawBoard(p, this.game.getBoardCopy());
@@ -153,7 +206,9 @@ public class TextUserInterface implements IUserInterface {
         }
     }
 
-    @Override
+    /**
+     * Draws the game over screen. This clears the screen and shows the scores. It blocks until the user presses enter.
+     */
     public void gameOver() {
         clear();
         System.out.println("Game over!");
@@ -170,13 +225,24 @@ public class TextUserInterface implements IUserInterface {
         this.scanner.nextLine();
     }
 
+    /**
+     * This is a custom comparator. This is used to sort the players of a game based on their scores. The highest score will be on top.
+     */
     public class DescScoreComparator implements Comparator<Player> {
+        /**
+         * This is a custom comparator. This is used to sort the players of a game based on their scores. The highest score will be on top.
+         */
         @Override
         public int compare(Player player, Player t1) {
-            return Math.min(0, t1.getScore()) - Math.min(0, player.getScore());
+            return t1.getScore() - player.getScore();
         }
     }
 
+    /**
+     * Asks the player via the TUI if it wants to make a PUT or a TRADE. Blocks until valid input is given.
+     * @param p The player who must make the move.
+     * @return Returns the type of the move: PUT or TRADE.
+     */
     @Override
     public Board.MoveType getMoveType(Player p) {
         int choice;
@@ -199,6 +265,11 @@ public class TextUserInterface implements IUserInterface {
         return null;
     }
 
+    /**
+     * Asks the player via the TUI what it wants to trade. Blocks until valid input is given.
+     * @param p The player who must make the move.
+     * @return The list of tiles from the player's hand which should be traded.
+     */
     @Override
     public List<Tile> getMoveTrade(Player p) {
         String choice;
@@ -216,6 +287,11 @@ public class TextUserInterface implements IUserInterface {
         return result;
     }
 
+    /**
+     * Asks the player via the UI what it wants to put. Blocks until valid input is given.
+     * @param p The player who must make the move.
+     * @return The move the player wants to make. It is a Map of Coordinates and Tiles.
+     */
     @Override
     public Map<Coordinate, Tile> getMovePut(Player p) {
         String choice;
@@ -229,6 +305,12 @@ public class TextUserInterface implements IUserInterface {
         return parseMoveString(p, choice);
     }
 
+    /**
+     * Parses the textual move entered by a player in the TUI.
+     * @param p The player who makes the move.
+     * @param s The string the user has entered in the terminal.
+     * @return The (parsed) move in the form of a map of coordinates and tiles.
+     */
     private Map<Coordinate, Tile> parseMoveString(Player p, String s) {
         Map<Coordinate, Tile> result = new HashMap<>();
         String[] moves = s.split(" ");
@@ -253,16 +335,27 @@ public class TextUserInterface implements IUserInterface {
         return result;
     }
 
+    /**
+     * Exits the TUI. For now this is just a system exit.
+     */
     public void exit() {
         System.exit(0);
     }
 
+    /**
+     * Clears the screen by printing the amount of newlines in the terminal as described by the attribute SKIP_LINES.
+     */
     private void clear() {
         for(int i = 0; i < SKIP_LINES; i++) {
             System.out.println("");
         }
     }
 
+    /**
+     * Updates the board. This is called by the observable and is part of the observer implementation.
+     * @param observable The observable class.
+     * @param o An updated object. This is not used in our case.
+     */
     @Override
     public void update(Observable observable, Object o) {
         clear();

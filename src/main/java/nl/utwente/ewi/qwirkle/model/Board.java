@@ -126,11 +126,9 @@ public class Board extends Observable {
      */
     public int doMove(Map<Coordinate, Tile> move) {
         if (validateMove(move)) {
-            Logger.debug("Length: " + move.size());
             int score = getScore(move);
             for (Coordinate c : move.keySet()) {
                 put(c, move.get(c));
-                Logger.debug("Put on board: " + c.getX() + "," + c.getY() + " - " + move.get(c).toString());
             }
             notifyObservers();
             return score;
@@ -139,12 +137,15 @@ public class Board extends Observable {
         }
     }
 
-    private int getScore(Map<Coordinate, Tile> move) {
+    public int getScore(Map<Coordinate, Tile> move) {
         int score = 0;
         boolean horizontal = isHorizontal(move);
         boolean vertical = isVertical(move);
-        Logger.debug("Horizontal: " + horizontal + ", vertical: " + vertical);
         boolean first = true;
+
+        if (move.size() == 1 && isEmpty()) {
+            return 1;
+        }
 
         Board tmpBoard = getCopy();
         for (Coordinate c : move.keySet()) {
@@ -204,9 +205,7 @@ public class Board extends Observable {
     }
 
     public boolean validateMove(Map<Coordinate, Tile> move) {
-        //Logger.debug("Validating . . . ");
         if (move == null || move.size() <= 0 || move.size() > Deck.QWIRKLE_SIZE) {
-            Logger.debug("Check failed: Invalid input.");
             return false; // Amount of placedTiles is not valid
         }
         // Check horizontal/vertical line
@@ -216,11 +215,51 @@ public class Board extends Observable {
         if (horizontal || vertical) {
             Board tmpBoard = getCopy();
             for (Coordinate c : move.keySet()) {
+                if (get(c) != null) {
+                    return false;
+                }
                 tmpBoard.put(c, move.get(c));
             }
             if (!tmpBoard.checkAllAdjacent()) {
-                Logger.debug("Not adjacent!");
                 return false;
+            }
+
+            if (horizontal) { // Check if in single set
+                int y = 0;
+                int high = Integer.MIN_VALUE;
+                int low = Integer.MAX_VALUE;
+                for (Coordinate c : move.keySet()) {
+                    y = c.getY();
+                    if (c.getX() < low) {
+                        low = c.getX();
+                    }
+                    if (c.getX() > high) {
+                        high = c.getX();
+                    }
+                }
+                for (int x = low; x <= high; x++) {
+                    if (tmpBoard.get(new Coordinate(x, y)) == null) {
+                        return false;
+                    }
+                }
+            } else {
+                int x = 0;
+                int high = Integer.MIN_VALUE;
+                int low = Integer.MAX_VALUE;
+                for (Coordinate c : move.keySet()) {
+                    x = c.getX();
+                    if (c.getY() < low) {
+                        low = c.getY();
+                    }
+                    if (c.getY() > high) {
+                        high = c.getY();
+                    }
+                }
+                for (int y = low; y <= high; y++) {
+                    if (tmpBoard.get(new Coordinate(x, y)) == null) {
+                        return false;
+                    }
+                }
             }
             for (Coordinate c : move.keySet()) {
                 List<Tile> tileList;
@@ -238,9 +277,7 @@ public class Board extends Observable {
                     tileList.add(tmpBoard.get(new Coordinate(c.getX() - i, c.getY())));
                     i++;
                 }
-                Logger.debug("tileList length: " + tileList.size());
                 if (!checkTileList(tileList)) {
-                    Logger.debug("Check failed: Horizontal checkTileList failed.");
                     return false;
                 }
 
@@ -257,13 +294,11 @@ public class Board extends Observable {
                     i++;
                 }
                 if (!checkTileList(tileList)) {
-                    Logger.debug("Check failed: Vertical checkTileList failed.");
                     return false;
                 }
             }
             return true;
         } else {
-            Logger.debug("Check failed: Not horzontal or vertical.");
             return false; // The tiles are not on the same row or column
         }
     }
@@ -354,11 +389,8 @@ public class Board extends Observable {
         if (sameShape && !sameColor) { // Check for different colors
             Set<Tile.Color> allColors = new HashSet<>();
             Collections.addAll(allColors, Tile.Color.values());
-            Logger.debug("Colors: " + allColors.size());
             for (Tile t : tiles) {
-                Logger.debug("Checking " + t.toString());
                 if (!allColors.remove(t.getColor())) {
-                    Logger.debug("TEST 2");
                     return false;
                 }
             }
@@ -368,13 +400,11 @@ public class Board extends Observable {
             Collections.addAll(allShapes, Tile.Shape.values());
             for (Tile t : tiles) {
                 if (!allShapes.remove(t.getShape())) {
-                    Logger.debug("TEST 3");
                     return false;
                 }
             }
             return true;
         } else {
-            Logger.debug("TEST 4");
             return false;
         }
     }
@@ -382,7 +412,6 @@ public class Board extends Observable {
     public boolean isPutPossible(List<Tile> tiles) {
         for (Tile t : tiles) {
             int[] boundaries = getBoundaries();
-            Logger.debug(boundaries[0] + " " + boundaries[1] + " " + boundaries[2] + " " + boundaries[3]);
             for (int x = boundaries[3]-1; x <= boundaries[1]+1; x++) {
                 for (int y = boundaries[2]-1; y <= boundaries[0]+1; y++) {
                     Map<Coordinate, Tile> m = new HashMap<>();

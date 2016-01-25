@@ -47,6 +47,9 @@ public class Client implements Runnable {
                 }
                 try {
                     game = new GameController(ui, playerList);
+                    for (Player p : playerList) {
+                        p.setGameController(game);
+                    }
                     ui.initGame(game);
                     game.play();
                 } catch (PlayerAmountInvalidException e) {
