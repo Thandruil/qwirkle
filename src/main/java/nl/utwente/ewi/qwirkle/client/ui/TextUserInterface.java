@@ -35,18 +35,17 @@ public class TextUserInterface implements IUserInterface {
             System.out.println("Welcome to Qwirkle!");
             System.out.println("");
             System.out.println("1 = Play local against AI or your friends");
-            System.out.println("2 = Play online against friends or strangers");
             System.out.println("");
             System.out.println("0 = Exit game");
             System.out.println("");
             choice = getInt();
-        } while (choice < 0 || choice > 2);
+        } while (choice < 0 || choice > 1);
         if (choice == 1) {
             return Client.GameType.LOCAL;
         }
-        if (choice == 2) {
-            return Client.GameType.ONLINE;
-        }
+        //if (choice == 2) {
+        //    return Client.GameType.ONLINE;
+        //}
         if (choice == 0) {
             exit();
         }
