@@ -20,16 +20,22 @@ public class Ai {
         return ret;
     }
 
-    public static Set<Coordinate> getPlacesToPut(Board b, Tile t) {
+    public static Set<Coordinate> getPlacesToPut(Board b, Tile t, boolean check) {
         Set<Coordinate> ret = new HashSet<>();
         int[] boundaries = b.getBoundaries();
-        for (int x = boundaries[3]-1; x <= boundaries[1]+1; x++) {
-            for (int y = boundaries[2] - 1; y <= boundaries[0] + 1; y++) {
+        if (!b.isEmpty()) {
+            boundaries[0] += 1;
+            boundaries[1] += 1;
+            boundaries[2] -= 1;
+            boundaries[3] -= 1;
+        }
+        for (int x = boundaries[3]; x <= boundaries[1]; x++) {
+            for (int y = boundaries[2]; y <= boundaries[0]; y++) {
                 Map<Coordinate, Tile> tmpMove = new HashMap<>();
                 tmpMove.put(new Coordinate(x, y), t);
-                //if (b.validateMove(tmpMove)) {
+                if (check && b.validateMove(tmpMove)) {
                     ret.add(new Coordinate(x, y));
-                //}
+                }
             }
         }
         return ret;
