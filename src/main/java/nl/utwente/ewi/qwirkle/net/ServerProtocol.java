@@ -27,7 +27,7 @@ public class ServerProtocol implements IProtocol {
     }
 
     public static String gameStart(Collection<String> players) {
-        return String.format("%s %s", IProtocol.SERVER_GAMESTART, players.stream().collect(Collectors.joining(",")));
+        return String.format("%s %s", IProtocol.SERVER_GAMESTART, players.stream().collect(Collectors.joining(" ")));
     }
 
     public static String gameEnd(Map<String, Integer> playerScores) {
