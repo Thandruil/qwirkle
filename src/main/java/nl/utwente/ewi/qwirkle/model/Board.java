@@ -1,8 +1,5 @@
 package nl.utwente.ewi.qwirkle.model;
 
-import nl.utwente.ewi.qwirkle.client.GameController;
-import nl.utwente.ewi.qwirkle.util.Logger;
-
 import java.util.*;
 
 /**
@@ -10,13 +7,12 @@ import java.util.*;
  * a game session. The Board is implemented using a HashMap, where the Hash
  * for each Tile is calculated using the coordinate. The origin of the
  * coordinates is the middle of the Board, where the first Tile should be placed.
- *
- * @author Erik Gaal, Jasper Boot
- * @version %I%
- * @since 0.1-w51
  */
 public class Board extends Observable {
 
+    /**
+     * Enum of the move types. This contains PUT (put tile(s) on the Board) and TRADE (trade tiles with the Deck).
+     */
     public enum MoveType {
         PUT,
         TRADE
@@ -35,7 +31,7 @@ public class Board extends Observable {
     }
 
     /**
-     * Get the Tile at an x, y coordinate.
+     * Get the Tile at an x, y Coordinate.
      *
      * @param c Coordinale
      * @return the Tile at the coordinates
@@ -45,7 +41,7 @@ public class Board extends Observable {
     }
 
     /**
-     * Places a given Tile at an x, y coordinate.
+     * Places a given Tile at an x, y Coordinate.
      *
      * @param c Coordinate
      * @param tile the Tile to be placed
@@ -56,7 +52,7 @@ public class Board extends Observable {
     }
 
     /**
-     * Removes a Tile at an x, y coordinate.
+     * Removes a Tile at an x, y Coordinate.
      *
      * @param c Coordinate
      */
@@ -66,7 +62,7 @@ public class Board extends Observable {
     }
 
     /**
-     * Get the coordinate boundaries of the Board
+     * Get the Coordinate boundaries of the Board
      *
      * @return the boundaries in form [top, right, bottom, left]
      */
@@ -81,6 +77,10 @@ public class Board extends Observable {
         return boundaries;
     }
 
+    /**
+     * Checks if the Board is empty.
+     * @return If the Board is empty.
+     */
     public boolean isEmpty() {
         return (this.map.keySet().size() == 0);
     }
@@ -120,7 +120,7 @@ public class Board extends Observable {
     }
 
     /**
-     * Validates a move, places the tiles on the board and calculates the score
+     * Validates a move, places the tiles on the board and calculates the score.
      * @param move A set of PlacedTiles indicating the move.
      * @return The score that should be awarded to a player for the given move.
      */
@@ -137,6 +137,11 @@ public class Board extends Observable {
         }
     }
 
+    /**
+     * Calculates the score of a given move.
+     * @param move The move of which the score should be calculated.
+     * @return The calculated score.
+     */
     public int getScore(Map<Coordinate, Tile> move) {
         int score = 0;
         boolean horizontal = isHorizontal(move);
@@ -204,6 +209,11 @@ public class Board extends Observable {
         return score;
     }
 
+    /**
+     * Checks if a move is valid according to the game rules.
+     * @param move The move that should be checked.
+     * @return If the move is valid.
+     */
     public boolean validateMove(Map<Coordinate, Tile> move) {
         if (move == null || move.size() <= 0 || move.size() > Deck.QWIRKLE_SIZE) {
             return false; // Amount of placedTiles is not valid
@@ -303,6 +313,11 @@ public class Board extends Observable {
         }
     }
 
+    /**
+     * Checks if the tiles of a given move are on a vertical line.
+     * @param move The move that should be checked.
+     * @return If the tiles are on a vertical line.
+     */
     private boolean isVertical(Map<Coordinate, Tile> move) {
         int currentX = 0;
         boolean first = true;
@@ -319,6 +334,11 @@ public class Board extends Observable {
         return true;
     }
 
+    /**
+     * Checks if the tiles of a given move are on a horizontal line.
+     * @param move The move that should be checked.
+     * @return If the tiles are on a horizontal line.
+     */
     private boolean isHorizontal(Map<Coordinate, Tile> move) {
         int currentY = 0;
         boolean first = true;
@@ -335,6 +355,10 @@ public class Board extends Observable {
         return true;
     }
 
+    /**
+     * Checks if all of the tiles on the board are connected to each other.
+     * @return If all tiles on the Board are connected.
+     */
     private boolean checkAllAdjacent() {
         if (this.map.size() == 1) {
             return true;
@@ -360,6 +384,11 @@ public class Board extends Observable {
         return true;
     }
 
+    /**
+     * Checks if a list of tiles could be placed in one line on the Board.
+     * @param tiles The tiles to be checked.
+     * @return If the tiles could be placed in one line on the Board.
+     */
     private static boolean checkTileList(List<Tile> tiles) {
         if (tiles == null || tiles.size() <= 0 || tiles.size() > Deck.HAND_SIZE) {
             return false;
@@ -409,8 +438,13 @@ public class Board extends Observable {
         }
     }
 
-    public boolean isPutPossible(List<Tile> tiles) {
-        for (Tile t : tiles) {
+    /**
+     * Checks if a put is possible. It does so by checking if the most minimal put is possible: putting a single Tile.
+     * @param hand The hand that should be checked upon.
+     * @return If a put is possible.
+     */
+    public boolean isPutPossible(List<Tile> hand) {
+        for (Tile t : hand) {
             int[] boundaries = getBoundaries();
             for (int x = boundaries[3]-1; x <= boundaries[1]+1; x++) {
                 for (int y = boundaries[2]-1; y <= boundaries[0]+1; y++) {
@@ -425,6 +459,10 @@ public class Board extends Observable {
         return false;
     }
 
+    /**
+     * Creates a copy of the Board object. It does this by copying all elements of the map to a new Board.
+     * @return A copy of the Board object.
+     */
     public Board getCopy() {
         Board b = new Board();
         for (Coordinate c : this.map.keySet()) {

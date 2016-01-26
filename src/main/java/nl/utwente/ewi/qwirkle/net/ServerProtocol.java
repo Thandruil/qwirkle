@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Parses input to a String that can be sent according to the Protocol.
+ */
 public class ServerProtocol implements IProtocol {
 
     public static String error(IProtocol.Error error) {

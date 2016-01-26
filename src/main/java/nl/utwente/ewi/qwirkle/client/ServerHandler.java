@@ -2,12 +2,11 @@ package nl.utwente.ewi.qwirkle.client;
 
 import nl.utwente.ewi.qwirkle.net.ClientProtocol;
 import nl.utwente.ewi.qwirkle.util.Logger;
-
 import java.io.*;
 import java.net.Socket;
 
 public class ServerHandler implements Runnable {
-
+    // TODO: 25-1-16 JAVADOC!!!
     public enum ClientState {
         CONNECTED,
         IDENTIFIED,

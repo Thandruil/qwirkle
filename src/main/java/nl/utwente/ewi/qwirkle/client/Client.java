@@ -1,28 +1,37 @@
 package nl.utwente.ewi.qwirkle.client;
 
-import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.client.ui.TextUserInterface;
 import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
-import nl.utwente.ewi.qwirkle.net.ClientProtocol;
 import nl.utwente.ewi.qwirkle.server.Server;
 import nl.utwente.ewi.qwirkle.util.Extra;
 import nl.utwente.ewi.qwirkle.util.Logger;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.util.List;
 
+/**
+ * Controlls all the actions of the client and the User Interface.
+ */
 public class Client implements Runnable {
 
+    /**
+     * Gives the two game types; LOCAL game and ONLINE game.
+     */
     public enum GameType {
         LOCAL,
         ONLINE
     }
 
+    /**
+     * Stores the gamecontroller of the active game.
+     */
     GameController game;
 
-    IUserInterface ui;
+    /**
+     * Stores the User Interface the user uses.
+     */
+    TextUserInterface ui;
 
     @Override
     public void run() {
@@ -31,11 +40,17 @@ public class Client implements Runnable {
         while (true) loop();
     }
 
+    /**
+     * Initializes the user interface.
+     */
     void init() {
         ui = new TextUserInterface();
         Logger.info("Client initialized.");
     }
 
+    /**
+     * Loops through a single game.
+     */
     void loop() {
         switch(ui.selectGameType()) {
             case LOCAL:
@@ -57,7 +72,8 @@ public class Client implements Runnable {
                 }
                 break;
             case ONLINE:
-                Logger.info("Online game has been chosen.");
+                Logger.info("Online game has been chosen. This feature is later removed from the TUI, so this should not work as inteded.");
+                /*
                 String[] server;
                 Socket sock;
                 do {
@@ -100,9 +116,14 @@ public class Client implements Runnable {
                 }
                 Logger.info("Connection closed.");
                 break;
+                */
         }
     }
 
+    /**
+     * Starts the client software
+     * @param args The arguments given to the program. This is not used in our code.
+     */
     public static void main(String[] args) {
         Logger.info("Starting client . . .");
         Client client = new Client();

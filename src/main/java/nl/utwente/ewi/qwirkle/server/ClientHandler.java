@@ -15,8 +15,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * Manages a single client and their state.
+ */
 public class ClientHandler implements Runnable {
 
+    /**
+     * The states a client can be in.
+     */
     public enum ClientState {
         CONNECTED,
         IDENTIFIED,
@@ -25,19 +31,51 @@ public class ClientHandler implements Runnable {
         GAME_TURN,
     }
 
+    /**
+     * The socket the client is connected to.
+     */
     private Socket socket;
+
+    /**
+     * The BufferedReader the server can read from.
+     */
     private BufferedReader in;
+
+    /**
+     * The BufferedWriter the server can write to.
+     */
     private BufferedWriter out;
 
+    /**
+     * If the connection is closed or not.
+     */
     private boolean closed;
 
+    /**
+     * The state the client is currently in.
+     */
     private ClientState state;
 
+    /**
+     * The Game which the client is currently participating in.
+     */
     private Game game;
 
+    /**
+     * The name of the client.
+     */
     private String name;
+
+    /**
+     * The features the client's implementation supports.
+     */
     private List<IProtocol.Feature> features;
 
+    /**
+     * Initializes the attributes based on a given Socket to the client.
+     * @param socket The Socket to which the client is connected to.
+     * @throws IOException Thrown when there is an error with the reader or the writer.
+     */
     public ClientHandler(Socket socket) throws IOException {
         this.socket = socket;
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -47,18 +85,37 @@ public class ClientHandler implements Runnable {
         this.closed = false;
     }
 
+    /**
+     * Gets the name of the client.
+     * @return The name of the client.
+     */
     public String getName() {
         return String.valueOf(name == null ? socket.getInetAddress() : name);
     }
 
+    /**
+     * Gets the features of the client.
+     * @return The features of the client.
+     */
     public List<IProtocol.Feature> getFeatures() {
         return features;
     }
 
+    /**
+     * Gets the state of the client.
+     * @return The state of the client.
+     */
     public ClientState getState() {
         return state;
     }
 
+    /**
+     * Called when the client wants to identify.
+     * @param name The name the client wants to claim.
+     * @param features The features the client supports.
+     * @throws IllegalStateException Thrown when this action is not allowed by the Protocol in this state.
+     * @throws NameException Thrown when the name is not conform to the naming standard of the Protocol.
+     */
     public void identify(String name, List<IProtocol.Feature> features) throws IllegalStateException, NameException {
         if (state != ClientState.CONNECTED) throw new IllegalStateException();
         PlayerList.addPlayer(name, this);
@@ -69,6 +126,12 @@ public class ClientHandler implements Runnable {
         writePacket(ServerProtocol.identify());
     }
 
+    /**
+     * Called when the client wants to enter a queue.
+     * @param queues The queues the client wants to enter. The integer represents a size of the queue. This means with how many players the client wants to play a Game.
+     * @throws IllegalStateException Thrown when this action is not allowed by the Protocol in this state.
+     * @throws IllegalQueueException Thrown when a given queue is not available.
+     */
     public void queue(List<Integer> queues) throws IllegalStateException, IllegalQueueException {
         if (state != ClientState.IDENTIFIED) throw new IllegalStateException();
         for (int i : queues) {
@@ -80,6 +143,13 @@ public class ClientHandler implements Runnable {
         PlayerList.checkQueues();
     }
 
+    /**
+     * Called when the client wants to make a PUT move.
+     * @param moves The move the client wants to make.
+     * @throws IllegalStateException Thrown when this action is not allowed by the Protocol in this state.
+     * @throws IllegalMoveException Thrown when the move is not valid according to the Game rules.
+     * @throws TilesNotOwnedException Thrown when one or more of the given tiles in the move are not in the hand of the Player.
+     */
     public void movePut(Map<Coordinate, Tile> moves) throws IllegalStateException, IllegalMoveException, TilesNotOwnedException {
         if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
         int score = game.doMove(moves);
@@ -88,6 +158,12 @@ public class ClientHandler implements Runnable {
 
     }
 
+    /**
+     * Called when the client wants to make a TRADE move.
+     * @param tiles The tiles the client wants to trade.
+     * @throws IllegalStateException Thrown when this action is not allowed by the Protocol in this state.
+     * @throws TilesNotOwnedException Thrown when one or more of the given tiles in the move are not in the hand of the Player.
+     */
     public void moveTrade(List<Tile> tiles) throws IllegalStateException, TilesNotOwnedException {
         if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
         game.doTrade(tiles);
@@ -95,7 +171,14 @@ public class ClientHandler implements Runnable {
         game.next();
     }
 
+    /**
+     * Called when the client wants to send a chat message.
+     * @param recipient The channel the message should be sent on. This could be @[PLAYER NAME], game or global. The implementation of game is not fully finished yet.
+     * @param message The message the client wants to send as a String.
+     * @throws IllegalStateException Thrown when this action is not allowed by the Protocol in this state.
+     */
     public void chat(String recipient, String message) throws IllegalStateException {
+        // TODO: 26-1-16 CHECK IMPLEMENTATION OF GAME CHANNEL AND EDIT THE JAVADOC ABOVE
         if (state == ClientState.CONNECTED) throw new IllegalStateException();
         if (recipient.equals("global"))
             PlayerList.getPlayerList().values().stream()
@@ -114,6 +197,9 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Called when the client wants to enter the lobby. Information about the lobby is being sent back to the client.
+     */
     public void lobby() {
         List<String> players = PlayerList.getPlayerList().values().stream()
                 .filter(p -> p.getState() != ClientState.CONNECTED)
@@ -123,6 +209,11 @@ public class ClientHandler implements Runnable {
         writePacket(ServerProtocol.lobby(players));
     }
 
+    /**
+     * Sends a message to the client that a Game has been started.
+     * @param game The started Game.
+     * @param players The players participating in the Game.
+     */
     public void sendGameStart(Game game, Collection<String> players) {
         this.game = game;
         this.state = ClientState.GAME_WAITING;
@@ -130,6 +221,10 @@ public class ClientHandler implements Runnable {
         writePacket(ServerProtocol.gameStart(players));
     }
 
+    /**
+     * Sends a message to the client that the Game has been ended.
+     * @param playerScores The scores of the players who participated in the Game.
+     */
     public void gameEnd(Map<String, Integer> playerScores) {
         this.game = null;
         this.state = ClientState.IDENTIFIED;
@@ -137,6 +232,10 @@ public class ClientHandler implements Runnable {
         writePacket(ServerProtocol.gameEnd(playerScores));
     }
 
+    /**
+     * Sends who is on turn to the client.
+     * @param player The name of the Player who is on turn.
+     */
     public void sendTurn(String player) {
         if (player.equals(name)) {
             this.state = ClientState.GAME_TURN;
@@ -145,6 +244,10 @@ public class ClientHandler implements Runnable {
         writePacket(ServerProtocol.turn(player));
     }
 
+    /**
+     * Sends a pass of a Player to the client.
+     * @param player The name of the Player sho passed.
+     */
     public void sendPass(String player) {
         if (player.equals(name)) {
             Logger.info(String.format("Player %s skipped", getName()));
@@ -152,19 +255,34 @@ public class ClientHandler implements Runnable {
         writePacket(ServerProtocol.turn(player));
     }
 
+    /**
+     * Sends a PUT move to the client.
+     * @param moves The put move.
+     */
     public void sendMovePut(Map<Coordinate, Tile> moves) {
         writePacket(ServerProtocol.movePut(moves));
     }
 
+    /**
+     * Sends a TRADE move to the client.
+     * @param amount The amount of tiles that are traded.
+     */
     public void sendMoveTrade(int amount) {
         writePacket(ServerProtocol.moveTrade(amount));
     }
 
+    /**
+     * Sends that tiles are being drawn to the client.
+     * @param tiles The tiles that are being drawn.
+     */
     public void drawTile(List<Tile> tiles) {
         Logger.info(String.format("Player %s drew %d tiles", getName(), tiles.size()));
         writePacket(ServerProtocol.drawTile(tiles));
     }
 
+    /**
+     * Checks for new incoming messages and parses them while the connection is not closed.
+     */
     public void run() {
         while (!closed) {
             try {
@@ -182,6 +300,9 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Disconnects the client from the server.
+     */
     public void disconnect() {
         if (closed) return;
         Logger.info(String.format("Disconnecting %s", getName()));
@@ -205,6 +326,10 @@ public class ClientHandler implements Runnable {
         closed = true;
     }
 
+    /**
+     * Sends a packet to the client.
+     * @param packet The packet to be sent to the client as a String.
+     */
     private void writePacket(String packet) {
         try {
             Logger.debug(String.format("[->%s] %s", getName(), packet));
@@ -215,6 +340,10 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    /**
+     * Parses a String message to the right model alterations.
+     * @param message The message to be parsed.
+     */
     private void parsePacket(String message) {
         try {
             String[] packetWords = message.split(" ");

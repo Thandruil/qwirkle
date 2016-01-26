@@ -1,32 +1,48 @@
 package nl.utwente.ewi.qwirkle.model;
 
-import nl.utwente.ewi.qwirkle.client.GameController;
 import nl.utwente.ewi.qwirkle.util.Ai;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.*;
 
+/**
+ * A computer player which prefers a put above a trade. If it has to trade, it trades a random selection of tiles. If it has to put, it puts a single Tile at a random valid location.
+ */
 public class DumbComputerPlayer extends Player {
 
-    private Random rand = new Random();
-
+    /**
+     * Calls the super to initialize the Player.
+     * @param name The name of the player.
+     */
     public DumbComputerPlayer(String name) {
         super(name);
     }
 
+    /**
+     * Returns always a PUT if asked what type of move to play.
+     * @return The MoveType PUT.
+     */
     @Override
     public Board.MoveType getMoveType() {
         return Board.MoveType.PUT;
     }
 
+    /**
+     * Trades a random selection of tiles.
+     * @return A random selection of tiles from the player's hand.
+     */
     @Override
     public List<Tile> getTradeMove() {
         return Ai.randomTrade(getHand());
     }
 
+    /**
+     * Chooses a random Tile to put at a random valid location.
+     * @return A random move of a single Tile.
+     */
     @Override
     public Map<Coordinate, Tile> getPutMove() {
-        if (getGameController().getBoardCopy().isEmpty()) { // If firstmove put longest streak
+        if (getGameController().getBoardCopy().isEmpty()) { // If first move, put longest streak
             Set<Tile> move = new HashSet<>();
             Set<Tile> uniqueHand = new HashSet<>(getHand());
             for (Tile.Shape s : Tile.Shape.values()) {
@@ -76,10 +92,5 @@ public class DumbComputerPlayer extends Player {
             Collections.shuffle(moveList);
             return moveList.get(0);
         }
-    }
-
-    @Override
-    public String toString() {
-        return "Dump Computer";
     }
 }

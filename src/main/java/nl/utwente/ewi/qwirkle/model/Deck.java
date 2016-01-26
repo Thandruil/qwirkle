@@ -7,10 +7,6 @@ import java.util.*;
  * The amount of tiles in a Deck should always consist of the amount
  * of colors times the amount of shapes times 3. With six colours
  * and six shapes, this sums up to a total of 108 tiles.
- *
- * @author Erik Gaal
- * @version %I%
- * @since 0.1w46
  */
 public class Deck {
     /**
@@ -77,6 +73,10 @@ public class Deck {
         }
     }
 
+    /**
+     * Adds a Tile to the Deck.
+     * @param t The Tile to be added to the Deck.
+     */
     public void addTile(Tile t) {
         this.tiles.add(t);
         shuffle();

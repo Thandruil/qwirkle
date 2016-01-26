@@ -1,12 +1,9 @@
 package nl.utwente.ewi.qwirkle.client.ui;
 
-import nl.utwente.ewi.qwirkle.client.Client;
-import nl.utwente.ewi.qwirkle.client.GameController;
 import nl.utwente.ewi.qwirkle.model.Board;
 import nl.utwente.ewi.qwirkle.model.Coordinate;
 import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.Tile;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Observer;
