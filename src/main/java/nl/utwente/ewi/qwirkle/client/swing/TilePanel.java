@@ -26,11 +26,12 @@ public class TilePanel extends JPanel {
                 Tile tile = board.get(new Coordinate(x, y));
                 JButton button = new JButton();
                 button.setPreferredSize(new Dimension(50, 50));
+                button.setMargin(new Insets(1, 1, 1, 1));
                 gbc.gridx = x + Math.max(boundaries[3], 3);
                 gbc.gridy = y - Math.max(boundaries[0], 3);
                 gbc.fill = GridBagConstraints.HORIZONTAL;
                 if (tile != null) {
-                    button.setText(String.valueOf(tile.hashCode()));
+                    button.setText(String.valueOf(tile.getColor().name().substring(0, 1) + tile.getShape().name().substring(0, 1).toLowerCase()));
                     button.setEnabled(false);
                 }
                 this.add(button, gbc);
