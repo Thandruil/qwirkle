@@ -5,29 +5,60 @@ import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.*;
 
+/**
+ * A computer Player which chooses the move which is worth the most points. This AI is limited in time, and the best move is chosen if there is not enough time left.
+ */
 public class EasyComputerPlayer extends Player {
-
+    /**
+     * The maximum time in seconds the AI is allowed to think.
+     */
     public static final int MAX_TIME = 10;
 
+    /**
+     * A static field for the AI to dump possible moves in.
+     */
     private static Set<Map<Coordinate, Tile>> possibleMoves;
 
+    /**
+     * Calls the super to initialize the Player.
+     * @param name The name of the player.
+     */
     public EasyComputerPlayer(String name) {
         super(name);
     }
 
+    /**
+     * Indicates if the AI finished the whole thinking process in time.
+     */
     private static boolean done;
+
+    /**
+     * Indicates if the AI should be killed because the time limit is near.
+     */
     private static boolean kill;
 
+    /**
+     * Always returns the MoveType PUT.
+     * @return The MoveType PUT.
+     */
     @Override
     public Board.MoveType getMoveType() {
         return Board.MoveType.PUT;
     }
 
+    /**
+     * Trades a random selection of tiles.
+     * @return A random selection of tiles from the player's hand.
+     */
     @Override
     public List<Tile> getTradeMove() {
         return Ai.randomTrade(getHand());
     }
 
+    /**
+     * Calculates the move which gives the most points. If the time runs out then the best move is chosen.
+     * @return The move which gives the most points.
+     */
     @Override
     public Map<Coordinate, Tile> getPutMove() {
         possibleMoves = new HashSet<>();
@@ -63,11 +94,11 @@ public class EasyComputerPlayer extends Player {
         return ret;
     }
 
-    @Override
-    public String toString() {
-        return "Easy Computer";
-    }
-
+    /**
+     * Calculates all the possible moves for the player.
+     * @param b The current Board.
+     * @param hand The hand of the Player.
+     */
     private void getPossibleMoves(Board b, List<Tile> hand) {
         for(Tile t : hand) {
             if (kill) {return;}
@@ -102,6 +133,13 @@ public class EasyComputerPlayer extends Player {
         done = true;
     }
 
+    /**
+     * Calculates all the possible moves for the player. This is a recursive function.
+     * @param b The current Board.
+     * @param hand The hand of the Player.
+     * @param prev The previous played tile.
+     * @return The set of possible moves.
+     */
     private Set<Map<Coordinate, Tile>> getPossibleMovesReturn(Board b, List<Tile> hand, Coordinate prev) {
         Set<Map<Coordinate, Tile>> ret = new HashSet<>();
         for(Tile t : hand) {
@@ -136,6 +174,12 @@ public class EasyComputerPlayer extends Player {
         return ret;
     }
 
+    /**
+     * Gives a set of the highest score moves from a set of moves.
+     * @param moves A set of moves to be filtered.
+     * @param b The current Board.
+     * @return The set of moves giving the highest score.
+     */
     private Set<Map<Coordinate, Tile>> getHighestPossibleMoves(Set<Map<Coordinate, Tile>> moves, Board b) {
         int currentScore = 0;
         Set<Map<Coordinate, Tile>> ret = new HashSet<>();
@@ -158,6 +202,10 @@ public class EasyComputerPlayer extends Player {
         return ret;
     }
 
+    /**
+     * Gives the highest possible move. If more moves give the highest score, a random one of them is chosen.
+     * @return The highest possible move.
+     */
     private Map<Coordinate, Tile> getHighestPossibleMove() {
         List<Map<Coordinate, Tile>> highest = new ArrayList<>(getHighestPossibleMoves(possibleMoves, getGameController().getBoardCopy()));
         Collections.shuffle(highest);

@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Parses input to a String that can be sent according to the Protocol.
+ */
 public class ServerProtocol implements IProtocol {
 
     public static String error(IProtocol.Error error) {
@@ -30,8 +33,8 @@ public class ServerProtocol implements IProtocol {
         return String.format("%s %s", IProtocol.SERVER_GAMESTART, players.stream().collect(Collectors.joining(" ")));
     }
 
-    public static String gameEnd(Map<String, Integer> playerScores) {
-        return String.format("%s %s", IProtocol.SERVER_GAMEEND, playerScores.keySet().stream().map(p -> p + "," + playerScores.get(p)).collect(Collectors.joining(" ")));
+    public static String gameEnd(Map<String, Integer> playerScores, boolean win) {
+        return String.format("%s %s %s", IProtocol.SERVER_GAMEEND, win ? "WIN" : "ERROR" , playerScores.keySet().stream().map(p -> p + "," + playerScores.get(p)).collect(Collectors.joining(" ")));
     }
 
     public static String turn(String player) {

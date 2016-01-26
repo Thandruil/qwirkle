@@ -8,6 +8,9 @@ import nl.utwente.ewi.qwirkle.util.TextAreaOutputStream;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Creates a screen to monitor the server status. This includes the clients connected and their states, if the server is online and the logs of the server.
+ */
 public class ServerUserInterface extends JFrame {
     private JPanel mainPanel;
     private JPanel leftPanel;
@@ -23,6 +26,9 @@ public class ServerUserInterface extends JFrame {
 
     private boolean status;
 
+    /**
+     * Created the elements and adds them to the frame. The left, mid and right panels are the main vertical panels whithin the frame.
+     */
     public ServerUserInterface() {
 
         mainPanel = new JPanel(new GridLayout(1,3));
@@ -50,7 +56,7 @@ public class ServerUserInterface extends JFrame {
         leftPanel.add(clientsText);
 
         clientList = new DefaultListModel<>();
-        JList clientListField = new JList(clientList);
+        JList clientListField = new JList<>(clientList);
         clientListField.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         clientListField.setLayoutOrientation(JList.HORIZONTAL_WRAP);
         clientListField.setVisibleRowCount(-1);
@@ -58,7 +64,8 @@ public class ServerUserInterface extends JFrame {
 
         logArea = new JTextArea();
         Logger.addOutputStream(Logger.INFO, new TextAreaOutputStream(logArea));
-        logArea.setPreferredSize(new Dimension(mainPanel.getWidth()/3, mainPanel.getHeight()));
+        //logArea.setPreferredSize(new Dimension(mainPanel.getWidth()/3, mainPanel.getHeight()));
+        JScrollPane scroll = new JScrollPane (logArea);
         //midPanel.add(logArea);
 
 
@@ -66,13 +73,18 @@ public class ServerUserInterface extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.add(mainPanel);
         mainPanel.add(leftPanel);
-        mainPanel.add(logArea);
+        //mainPanel.add(logArea);
+        mainPanel.add(scroll);
         mainPanel.add(rightPanel);
         pack();
         setLocationRelativeTo(getParent());
         setVisible(true);
     }
 
+    /**
+     * Sets the status in the User Interface of the server.
+     * @param s Should be TRUE for 'Online' and FALSE for 'Offline'.
+     */
     public void setStatus(boolean s) {
         if (s) {
             statusText.setForeground(Color.GREEN);
@@ -83,14 +95,25 @@ public class ServerUserInterface extends JFrame {
         }
     }
 
+    /**
+     * Sets the IP of the server in the User Interface.
+     * @param ip The IP of the server as a String.
+     */
     public void setIp(String ip) {
         ipText.setText("IP: " + ip);
     }
 
+    /**
+     * Sets the port the server is listening on in the User Interface.
+     * @param port The port the server is listening on as a String.
+     */
     public void setPort(String port) {
         portText.setText("Port: " + port);
     }
 
+    /**
+     * Updates the connected clients and their states.
+     */
     public void updateClients() {
         clientList.clear();
         for (ClientHandler ch : PlayerList.getPlayerList().values()) {

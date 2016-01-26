@@ -9,6 +9,9 @@ import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.*;
 
+/**
+ * Implements a user interface by interaction with the terminal.
+ */
 public class TextUserInterface implements IUserInterface {
 
     /**

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InternetPlayer extends Player {
-
+    // TODO: 25-1-16 JAVADOC!
     public InternetPlayer(String name) {
         super(name);
     }

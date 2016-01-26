@@ -1,23 +1,65 @@
 package nl.utwente.ewi.qwirkle.client;
 
-import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
+import nl.utwente.ewi.qwirkle.client.ui.TextUserInterface;
 import nl.utwente.ewi.qwirkle.model.*;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.util.*;
 
+/**
+ * Controlls all the aspects from a game. For every game a new GameController should be made.
+ */
 public class GameController {
-    public static final int MIN_PLAYERS = 2;
-    public static final int MAX_PLAYERS = 4;
-    //public static final int POINTS_LAST_TURN = 6;
 
+    /**
+     * The minimum amount of players in a game.
+     */
+    public static final int MIN_PLAYERS = 2;
+
+    /**
+     * The maximum amount of players in a game.
+     */
+    public static final int MAX_PLAYERS = 4;
+
+    /**
+     * Represents the amount of bonus points given to the last player's turn.
+     * @deprecated This is not used in the current implementation
+     */
+    @Deprecated
+    public static final int POINTS_LAST_TURN = 6;
+
+    /**
+     * Stores the game board.
+     */
     private Board board;
-    private IUserInterface ui;
+
+    /**
+     * Stores the User Interface.
+     */
+    private TextUserInterface ui;
+
+    /**
+     * Stores the deck.
+     */
     private Deck deck;
+
+    /**
+     * Stores the players taking part in the game.
+     */
     private List<Player> playerList;
+
+    /**
+     * Stores the index of the player in playerList who is on turn.
+     */
     private int playerTurn;
 
-    public GameController(IUserInterface ui, List<Player> playerList) throws PlayerAmountInvalidException {
+    /**
+     *Initializes the game. Also adds the UI as an observer to the board.
+     * @param ui The User Interface the player uses.
+     * @param playerList A list of the player taking part in the game.
+     * @throws PlayerAmountInvalidException Thrown when the player amount is not within the set bounds.
+     */
+    public GameController(TextUserInterface ui, List<Player> playerList) throws PlayerAmountInvalidException {
         if (playerList != null && playerList.size() >= MIN_PLAYERS && playerList.size() <= MAX_PLAYERS && ui != null) {
             this.playerList = playerList;
             this.deck = new Deck();
@@ -62,7 +104,7 @@ public class GameController {
     }
 
     /**
-     * This function plays a whole game.
+     * Plays whole game. This consists of a turn of a player, refilling the player's hand, check if the game has ended and passing the turn.
      */
     public void play() {
         init();
@@ -190,16 +232,32 @@ public class GameController {
         playerTurn = (playerTurn + 1) % playerList.size();
     }
 
+    /**
+     * Get a copy of the board.
+     * @return The copied board.
+     */
     public Board getBoardCopy() {
         return this.board.getCopy();
     }
 
+    /**
+     * Returns the player who is on turn from the playerList.
+     * @return The player who is on turn.
+     */
     public Player getCurrentPlayer() {
         return this.playerList.get(this.playerTurn);
     }
 
+    /**
+     * Get the list of players taking part in the game.
+     * @return The list of players taking part in the game.
+     */
     public List<Player> getPlayers() { return this.playerList; }
 
+    /**
+     * Get the amount of tiles remaining in the deck.
+     * @return The amount of tiles remaining in the deck.s
+     */
     public int getDeckRemaining() { return this.deck.remaining(); }
 
 }

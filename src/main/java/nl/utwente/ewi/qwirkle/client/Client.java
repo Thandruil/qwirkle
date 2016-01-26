@@ -6,23 +6,33 @@ import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
 import nl.utwente.ewi.qwirkle.server.Server;
 import nl.utwente.ewi.qwirkle.util.Extra;
 import nl.utwente.ewi.qwirkle.util.Logger;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 
+/**
+ * Controlls all the actions of the client and the User Interface.
+ */
 public class Client implements Runnable {
 
+    /**
+     * Gives the two game types; LOCAL game and ONLINE game.
+     */
     public enum GameType {
         LOCAL,
         ONLINE
     }
 
+    /**
+     * Stores the gamecontroller of the active game.
+     */
     GameController game;
 
+    /**
+     * Stores the User Interface the user uses.
+     */
     TextUserInterface ui;
 
     @Override
@@ -32,13 +42,19 @@ public class Client implements Runnable {
         while (true) loop();
     }
 
+    /**
+     * Initializes the user interface.
+     */
     void init() {
         ui = new TextUserInterface();
         Logger.info("Client initialized.");
     }
 
+    /**
+     * Loops through a single game.
+     */
     void loop() {
-        switch (ui.selectGameType()) {
+        switch(ui.selectGameType()) {
             case LOCAL:
                 Logger.info("Local game has been chosen.");
                 List<Player> playerList = ui.selectPlayers();
@@ -125,7 +141,10 @@ public class Client implements Runnable {
         }
     }
 
-
+    /**
+     * Starts the client software
+     * @param args The arguments given to the program. This is not used in our code.
+     */
     public static void main(String[] args) {
         Logger.info("Starting client . . .");
         Client client = new Client();

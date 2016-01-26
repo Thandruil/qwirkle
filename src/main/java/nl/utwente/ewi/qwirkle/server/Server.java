@@ -6,29 +6,61 @@ import nl.utwente.ewi.qwirkle.server.model.PlayerList;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * The server handling the initialization and the accepting of new connections.
+ */
 public class Server implements Runnable {
 
+    /**
+     * The minimum port for the server to listen on.
+     */
     public static final int MIN_PORT = 1024;
+
+    /**
+     * The maximum port for the server to listen on.
+     */
     public static final int MAX_PORT = 65536;
 
+    /**
+     * Indicates if the server is running.
+     */
     boolean running = true;
 
+    /**
+     * Holds the connected Players.
+     */
     PlayerList players = new PlayerList();
 
+    /**
+     * Holds the port the server is listening on.
+     */
     private int port;
+
+    /**
+     * Holds the Socket the server is listening on.
+     */
     private ServerSocket server;
+
+    /**
+     * Holds the User Interface of the server.
+     */
     private ServerUserInterface ui;
 
+    /**
+     * Starts te loop of the server.
+     */
     @Override
     public void run() {
         init();
         while (running) loop();
     }
 
+    /**
+     * Initializes the server and asks the user which port it should listen on.
+     */
     void init() {
         while (server == null) {
             ChoosePort cp;
@@ -53,7 +85,7 @@ public class Server implements Runnable {
                         ui.updateClients();
                         try {
                             Thread.sleep(1000);
-                        } catch (InterruptedException e) {}
+                        } catch (InterruptedException ignored) {}
                     }
                 }).start();
             } catch (IOException e) {
@@ -63,6 +95,9 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * The loop checking for new incomming connections.
+     */
     void loop() {
         Socket client;
 
@@ -75,10 +110,17 @@ public class Server implements Runnable {
         }
     }
 
+    /**
+     * Stops the execution of the server.
+     */
     void stop() {
         running = false;
     }
 
+    /**
+     * Creates a new server and starts it.
+     * @param args The arguments given to the program. This is not used in our code.
+     */
     public static void main(String[] args) {
         Server server = new Server();
         new Thread(server).start();

@@ -12,13 +12,35 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * This class models a Game for the server.
+ */
 public class Game {
+    /**
+     * The Board of the Game.
+     */
     private Board board;
+    /**
+     * The Deck of the Game.
+     */
     private Deck deck;
+    /**
+     * The players in the Game.
+     */
     private Map<ClientHandler, Player> players;
+    /**
+     * The clients connected to the server and the Game.
+     */
     private List<ClientHandler> clients;
+    /**
+     * The index of clients which indicates who is on turn.
+     */
     private int turn;
 
+    /**
+     * Initializes the attributes.
+     * @param players The players that are in this Game.
+     */
     public Game(List<ClientHandler> players) {
         this.board = new Board();
         this.deck = new Deck();
@@ -29,42 +51,71 @@ public class Game {
         }
     }
 
+    /**
+     * Get the players in this Game.
+     * @return The players in this Game.
+     */
     public Map<ClientHandler, Player> getPlayers() {
         return players;
     }
 
+    /**
+     * Get the client who is on turn.
+     * @return The client who is on turn.
+     */
     public ClientHandler getCurrentClient() {
         return clients.get(turn);
     }
 
+    /**
+     * Get the Player who is on turn.
+     * @return The Player who is on turn.
+     */
     public Player getCurrentPlayer() {
         return players.get(clients.get(turn));
     }
 
+    /**
+     * Sends to the clients who is on turn.
+     */
     public void sendTurn() {
         for (ClientHandler client : clients) {
             client.sendTurn(getCurrentPlayer().getName());
         }
     }
 
+    /**
+     * Sends to the clients that there was a pass.
+     */
     public void sendPass() {
         for (ClientHandler client : clients) {
             client.sendPass(getCurrentPlayer().getName());
         }
     }
 
+    /**
+     * Sends to the clients a PUT move.
+     * @param moves The move to be sent.
+     */
     public void sendMovePut(Map<Coordinate, Tile> moves) {
         for (ClientHandler client : clients) {
             client.sendMovePut(moves);
         }
     }
 
+    /**
+     * Sends to the clients that there was a TRADE move.
+     * @param amount The amount of tiles traded.
+     */
     public void sendMoveTrade(int amount) {
         for (ClientHandler client : clients) {
             client.sendMoveTrade(amount);
         }
     }
 
+    /**
+     * Initializes the game. Shuffles the deck, hands out the starting tiles to the players and decides who may start.
+     */
     public void start() {
         deck.shuffle();
 
@@ -75,7 +126,7 @@ public class Game {
 
             } catch (EmptyDeckException e) {
                 Logger.fatal(e);
-                end();
+                end(false);
             }
         }
 
@@ -97,7 +148,7 @@ public class Game {
         }
 
         for (int i = 0; i < players.values().size(); i++) {
-            Logger.debug(String.format("Longest stream of %s is %s", clients.get(i).getName(), players.get(clients.get(i)).longestStreak()));
+            Logger.debug(String.format("Longest streak of %s is %s", clients.get(i).getName(), players.get(clients.get(i)).longestStreak()));
             if (players.get(clients.get(i)).longestStreak() > getCurrentPlayer().longestStreak()) {
                 turn = i;
             }
@@ -105,13 +156,23 @@ public class Game {
         sendTurn();
     }
 
-    public void end() {
+    /**
+     * Sends a game end to the clients and their scores.
+     */
+    public void end(boolean win) {
         Map<String, Integer> playerScores = players.values().stream().collect(Collectors.toMap(Player::getName, Player::getScore));
         for (ClientHandler client : clients) {
-            client.gameEnd(playerScores);
+            client.gameEnd(playerScores, win);
         }
     }
 
+    /**
+     * Executes a move of the current Player.
+     * @param moves The move to be made.
+     * @return The score of the move.
+     * @throws IllegalMoveException Thrown when the move is not valid according to the game rules.
+     * @throws TilesNotOwnedException Thrown when the current Player does not have one or more of the given tiles in it's hand.
+     */
     public int doMove(Map<Coordinate, Tile> moves) throws IllegalMoveException, TilesNotOwnedException {
         for (Tile tile : moves.values()) {
             if (!getCurrentPlayer().getHand().contains(tile)) throw new TilesNotOwnedException();
@@ -130,7 +191,15 @@ public class Game {
         return score;
     }
 
-    public void doTrade(List<Tile> tiles) throws TilesNotOwnedException {
+    /**
+     * Executes a trade on the player.
+     * @param tiles The tiles to be traded.
+     * @throws TilesNotOwnedException Thrown when the current Player does not have one or more of the given tiles in it's hand.
+     */
+    public void doTrade(List<Tile> tiles) throws TilesNotOwnedException, IllegalMoveException {
+        if (board.isEmpty()) {
+            throw new IllegalMoveException();
+        }
         for (Tile tile : tiles) {
             if (!getCurrentPlayer().getHand().contains(tile)) throw new TilesNotOwnedException();
         }
@@ -146,9 +215,12 @@ public class Game {
         sendMoveTrade(tiles.size());
     }
 
+    /**
+     * Fills the hand with tiles again.
+     */
     public void drawTiles() {
         List<Tile> tiles = new ArrayList<>();
-        for (int i = 0; i < 6 - getCurrentPlayer().getHand().size(); i++) {
+        for (int i = 0; i < Deck.HAND_SIZE - getCurrentPlayer().getHand().size(); i++) {
             if (deck.remaining() > 0) {
                 try {
                     tiles.add(deck.drawTile());
@@ -161,6 +233,9 @@ public class Game {
         getCurrentClient().drawTile(tiles);
     }
 
+    /**
+     * Passes the turn to the next Player and checks if the player can have a turn or has to pass.
+     */
     public void next() {
         turn = (turn + 1) % players.size();
 
@@ -174,5 +249,13 @@ public class Game {
         } else {
             sendTurn();
         }
+    }
+
+    /**
+     * Returns if the Board of this Game is empty.
+     * @return If the Board of this Game is empty.
+     */
+    public boolean isBoardEmpty() {
+        return board.isEmpty();
     }
 }

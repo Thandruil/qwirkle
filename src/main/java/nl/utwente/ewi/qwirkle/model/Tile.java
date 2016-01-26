@@ -4,10 +4,6 @@ package nl.utwente.ewi.qwirkle.model;
  * Tile is the class for representing a physical Tile that would
  * be laid upon the game board. Each Tile has several properties,
  * such as a color and a shape.
- *
- * @author Erik Gaal
- * @version %I%
- * @since 0.1-w46
  */
 public class Tile {
 
@@ -100,11 +96,20 @@ public class Tile {
         return (o instanceof Tile && ((Tile) o).getColor() == getColor() && ((Tile) o).getShape() == getShape());
     }
 
+    /**
+     * Generates a hash of the tile's color and shape for HashMaps and HashSets to work.
+     * @return The hash of the tile.
+     */
     @Override
     public int hashCode() {
         return getColor().ordinal() * 6 + getShape().ordinal();
     }
 
+    /**
+     * Parses an Integer to a Tile. The integer is used in the communication protocol.
+     * @param i The Integer to be parsed.
+     * @return The Tile the Integer represents or null if the Integer does not belong to a Tile.
+     */
     public static Tile parseTile(int i) {
         if (i >= 0 && i < Shape.values().length * Color.values().length) {
             Shape s = Shape.values()[i % Shape.values().length];

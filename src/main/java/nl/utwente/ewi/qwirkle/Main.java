@@ -4,8 +4,10 @@ import nl.utwente.ewi.qwirkle.client.Client;
 import nl.utwente.ewi.qwirkle.server.Server;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
+/**
+ * Called to start the application.
+ */
 public class Main {
-
     static final String USAGE_STRING = "" +
             "usage: java -jar qwirkle.jar [-client] [-server] [-v[vv]]\n" +
             "\t-client\t\tRun the client.\n" +

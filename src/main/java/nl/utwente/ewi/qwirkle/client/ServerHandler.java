@@ -7,7 +7,6 @@ import nl.utwente.ewi.qwirkle.net.ClientProtocol;
 import nl.utwente.ewi.qwirkle.net.IProtocol;
 import nl.utwente.ewi.qwirkle.net.ServerProtocol;
 import nl.utwente.ewi.qwirkle.util.Logger;
-
 import java.io.*;
 import java.net.Socket;
 import java.util.*;
@@ -16,7 +15,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ServerHandler implements Runnable {
-
+    // TODO: 25-1-16 JAVADOC!!!
     public enum ClientState {
         CONNECTED,
         IDENTIFIED,
