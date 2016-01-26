@@ -126,7 +126,7 @@ public class Game {
 
             } catch (EmptyDeckException e) {
                 Logger.fatal(e);
-                end();
+                end(false);
             }
         }
 
@@ -159,10 +159,10 @@ public class Game {
     /**
      * Sends a game end to the clients and their scores.
      */
-    public void end() {
+    public void end(boolean win) {
         Map<String, Integer> playerScores = players.values().stream().collect(Collectors.toMap(Player::getName, Player::getScore));
         for (ClientHandler client : clients) {
-            client.gameEnd(playerScores);
+            client.gameEnd(playerScores, win);
         }
     }
 
@@ -196,7 +196,10 @@ public class Game {
      * @param tiles The tiles to be traded.
      * @throws TilesNotOwnedException Thrown when the current Player does not have one or more of the given tiles in it's hand.
      */
-    public void doTrade(List<Tile> tiles) throws TilesNotOwnedException {
+    public void doTrade(List<Tile> tiles) throws TilesNotOwnedException, IllegalMoveException {
+        if (board.isEmpty()) {
+            throw new IllegalMoveException();
+        }
         for (Tile tile : tiles) {
             if (!getCurrentPlayer().getHand().contains(tile)) throw new TilesNotOwnedException();
         }
@@ -246,5 +249,13 @@ public class Game {
         } else {
             sendTurn();
         }
+    }
+
+    /**
+     * Returns if the Board of this Game is empty.
+     * @return If the Board of this Game is empty.
+     */
+    public boolean isBoardEmpty() {
+        return board.isEmpty();
     }
 }

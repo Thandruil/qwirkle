@@ -153,8 +153,12 @@ public class ClientHandler implements Runnable {
      */
     public void movePut(Map<Coordinate, Tile> moves) throws IllegalStateException, IllegalMoveException, TilesNotOwnedException {
         if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
+        if (game.isBoardEmpty() && moves.size() != game.getCurrentPlayer().longestStreak()) {
+            throw new IllegalMoveException();
+        }
         int score = game.doMove(moves);
         Logger.info(String.format("Player %s moved %d tiles for %d points", getName(), moves.size(), score));
+        game.getCurrentPlayer().addScore(score);
         game.drawTiles();
         game.next();
     }
@@ -165,7 +169,7 @@ public class ClientHandler implements Runnable {
      * @throws IllegalStateException Thrown when this action is not allowed by the Protocol in this state.
      * @throws TilesNotOwnedException Thrown when one or more of the given tiles in the move are not in the hand of the Player.
      */
-    public void moveTrade(List<Tile> tiles) throws IllegalStateException, TilesNotOwnedException {
+    public void moveTrade(List<Tile> tiles) throws IllegalStateException, TilesNotOwnedException, IllegalMoveException {
         if (state != ClientState.GAME_TURN || game == null) throw new IllegalStateException();
         game.doTrade(tiles);
         Logger.info(String.format("Player %s traded %d tiles", getName(), tiles.size()));
@@ -227,11 +231,11 @@ public class ClientHandler implements Runnable {
      * Sends a message to the client that the Game has been ended.
      * @param playerScores The scores of the players who participated in the Game.
      */
-    public void gameEnd(Map<String, Integer> playerScores) {
+    public void gameEnd(Map<String, Integer> playerScores, boolean win) {
         this.game = null;
         this.state = ClientState.IDENTIFIED;
         Logger.info(String.format("Player %s ended their game", getName()));
-        writePacket(ServerProtocol.gameEnd(playerScores));
+        writePacket(ServerProtocol.gameEnd(playerScores, win));
     }
 
     /**
@@ -279,7 +283,9 @@ public class ClientHandler implements Runnable {
      */
     public void drawTile(List<Tile> tiles) {
         Logger.info(String.format("Player %s drew %d tiles", getName(), tiles.size()));
-        writePacket(ServerProtocol.drawTile(tiles));
+        if (tiles.size() > 0) {
+            writePacket(ServerProtocol.drawTile(tiles));
+        }
     }
 
     /**
@@ -308,7 +314,7 @@ public class ClientHandler implements Runnable {
     public void disconnect() {
         if (closed) return;
         Logger.info(String.format("Disconnecting %s", getName()));
-        if (game != null) PlayerList.stopGame(game);
+        if (game != null) PlayerList.stopGame(game, false);
         PlayerList.removePlayer(getName());
         PlayerList.updateLobby();
         try {

@@ -64,7 +64,8 @@ public class ServerUserInterface extends JFrame {
 
         logArea = new JTextArea();
         Logger.addOutputStream(Logger.INFO, new TextAreaOutputStream(logArea));
-        logArea.setPreferredSize(new Dimension(mainPanel.getWidth()/3, mainPanel.getHeight()));
+        //logArea.setPreferredSize(new Dimension(mainPanel.getWidth()/3, mainPanel.getHeight()));
+        JScrollPane scroll = new JScrollPane (logArea);
         //midPanel.add(logArea);
 
 
@@ -72,7 +73,8 @@ public class ServerUserInterface extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         this.add(mainPanel);
         mainPanel.add(leftPanel);
-        mainPanel.add(logArea);
+        //mainPanel.add(logArea);
+        mainPanel.add(scroll);
         mainPanel.add(rightPanel);
         pack();
         setLocationRelativeTo(getParent());

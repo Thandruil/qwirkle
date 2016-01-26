@@ -137,8 +137,8 @@ public class PlayerList {
      * Stops and removes a Game from the server.
      * @param game The Game to be stopped and removed.
      */
-    public static synchronized void stopGame(Game game) {
-        game.end();
+    public static synchronized void stopGame(Game game, boolean win) {
+        game.end(win);
         gameList.remove(game);
     }
 
