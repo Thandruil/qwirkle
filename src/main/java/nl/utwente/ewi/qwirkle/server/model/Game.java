@@ -6,6 +6,7 @@ import nl.utwente.ewi.qwirkle.server.IllegalMoveException;
 import nl.utwente.ewi.qwirkle.server.TilesNotOwnedException;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -209,6 +210,24 @@ public class Game {
             deck.addTile(tile);
         }
         sendMoveTrade(tiles.size());
+    }
+
+    /**
+     * Fills the hand with tiles again.
+     */
+    public void drawTiles() {
+        List<Tile> tiles = new ArrayList<>();
+        for (int i = 0; i < Deck.HAND_SIZE - getCurrentPlayer().getHand().size(); i++) {
+            if (deck.remaining() > 0) {
+                try {
+                    tiles.add(deck.drawTile());
+                } catch (EmptyDeckException e) {
+                    Logger.fatal(e);
+                }
+            }
+        }
+        getCurrentPlayer().addTile(tiles);
+        getCurrentClient().drawTile(tiles);
     }
 
     /**

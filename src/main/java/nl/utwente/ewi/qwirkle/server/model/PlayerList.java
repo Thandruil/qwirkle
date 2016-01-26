@@ -1,5 +1,7 @@
 package nl.utwente.ewi.qwirkle.server.model;
 
+import nl.utwente.ewi.qwirkle.net.IProtocol;
+import nl.utwente.ewi.qwirkle.net.ServerProtocol;
 import nl.utwente.ewi.qwirkle.server.*;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
@@ -138,5 +140,12 @@ public class PlayerList {
     public static synchronized void stopGame(Game game) {
         game.end();
         gameList.remove(game);
+    }
+
+    public static synchronized void updateLobby() {
+        PlayerList.getPlayerList().values().stream()
+                .filter(p -> p.getFeatures().contains(IProtocol.Feature.LOBBY))
+                .filter(p -> p.getState() != ClientHandler.ClientState.CONNECTED)
+                .forEach(ClientHandler::lobby);
     }
 }
