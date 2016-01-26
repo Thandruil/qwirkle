@@ -19,7 +19,7 @@ public class ServerProtocol implements IProtocol {
     }
 
     public static String identify() {
-        return String.format("%s %s", IProtocol.SERVER_IDENTIFY, "CHAT");
+        return String.format("%s %s", IProtocol.SERVER_IDENTIFY, "CHAT,LOBBY");
     }
 
     public static String queue(List<Integer> queues) {
