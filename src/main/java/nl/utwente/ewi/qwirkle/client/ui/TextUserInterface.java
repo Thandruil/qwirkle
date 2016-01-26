@@ -219,7 +219,7 @@ public class TextUserInterface implements IUserInterface {
         System.out.println("");
         System.out.print(b.toString());
         System.out.println("");
-        System.out.print("Your tiles: ");
+        System.out.print(p.getName() + "'s tiles: ");
         int i = 1;
         for (Tile t : p.getHand()) {
             System.out.print(" " + i++ + ": " + t.toString());
@@ -242,16 +242,20 @@ public class TextUserInterface implements IUserInterface {
     /**
      * Draws the game over screen. This clears the screen and shows the scores. It blocks until the user presses enter.
      */
-    public void gameOver() {
+    public void gameOver(boolean win) {
         clear();
         System.out.println("Game over!");
         System.out.println("");
-        System.out.println("Score:");
-        System.out.println("");
-        List<Player> plist = this.game.getPlayers();
-        Collections.sort(plist, new DescScoreComparator());
-        for (Player p : plist) {
-            System.out.println(p.getName() + ": " + p.getScore());
+        if (win) {
+            System.out.println("Score:");
+            System.out.println("");
+            List<Player> plist = this.game.getPlayers();
+            Collections.sort(plist, new DescScoreComparator());
+            for (Player p : plist) {
+                System.out.println(p.getName() + ": " + p.getScore());
+            }
+        } else {
+            System.out.println("Someone exited the game. The game has not been finished.");
         }
         System.out.println("");
         System.out.println("Press enter to continue to the main menu.");
@@ -391,6 +395,10 @@ public class TextUserInterface implements IUserInterface {
      */
     @Override
     public void update(Observable observable, Object o) {
+        update();
+    }
+
+    public void update() {
         clear();
         drawBoard(game.getCurrentPlayer());
     }

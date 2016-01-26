@@ -122,7 +122,7 @@ public class GameController {
             }
             nextPlayer();
         }
-        ui.gameOver();
+        ui.gameOver(true);
     }
 
     /**

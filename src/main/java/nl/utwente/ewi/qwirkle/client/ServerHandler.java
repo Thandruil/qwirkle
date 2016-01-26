@@ -124,6 +124,9 @@ public class ServerHandler implements Runnable {
     }
 
     public void error(String error) {
+        if (playerTurn.getName().equals(clientPlayer.getName()) && error.equals("MOVE_INVALID")) {
+            turn(clientPlayer.getName());
+        }
     }
 
     public void sendQueue(List<Integer> queues) {
@@ -244,7 +247,7 @@ public class ServerHandler implements Runnable {
                         }
                     }
                 }
-                this.game.getUI().gameOver();
+                this.game.getUI().gameOver(args[0].equals("WIN"));
                 for (Player p : game.getPlayers()) {
                     clientPlayer.setScore(0);
                     clientPlayer.emptyHand();

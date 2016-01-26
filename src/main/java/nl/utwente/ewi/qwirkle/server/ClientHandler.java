@@ -246,6 +246,8 @@ public class ClientHandler implements Runnable {
         if (player.equals(name)) {
             this.state = ClientState.GAME_TURN;
             Logger.info(String.format("Player %ss turn", getName()));
+        } else {
+            this.state = ClientState.GAME_WAITING;
         }
         writePacket(ServerProtocol.turn(player));
     }

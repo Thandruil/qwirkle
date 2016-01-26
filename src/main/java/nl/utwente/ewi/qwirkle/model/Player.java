@@ -78,6 +78,9 @@ public abstract class Player {
      */
     public void addScore(int score) {
         this.score += score;
+        if (getGameController() != null && getGameController().getUI() != null) {
+            getGameController().getUI().update();
+        }
     }
 
     /**

@@ -128,7 +128,7 @@ public class Client implements Runnable {
                 while (!socket.isClosed()) {
 
                     List<Integer> queues;
-                    while (server.getState() == ServerHandler.ClientState.IDENTIFIED) {
+                    while (!socket.isClosed() && server.getState() == ServerHandler.ClientState.IDENTIFIED) {
                         queues = ui.selectQueus();
                         server.sendQueue(queues);
                         try {
@@ -138,7 +138,7 @@ public class Client implements Runnable {
                         }
                     }
 
-                    while (server.getState() == ServerHandler.ClientState.QUEUED) {
+                    while (!socket.isClosed() && server.getState() == ServerHandler.ClientState.QUEUED) {
                         ui.message("Looking for a game . . .");
                         try {
                             Thread.sleep(1000);
@@ -147,7 +147,7 @@ public class Client implements Runnable {
                         }
                     }
 
-                    while (server.getState() == ServerHandler.ClientState.GAME_TURN || server.getState() == ServerHandler.ClientState.GAME_WAITING) {
+                    while (!socket.isClosed() && server.getState() == ServerHandler.ClientState.GAME_TURN || server.getState() == ServerHandler.ClientState.GAME_WAITING) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {
