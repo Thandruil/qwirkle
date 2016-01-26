@@ -52,17 +52,18 @@ public class TextUserInterface implements IUserInterface {
             System.out.println("Welcome to Qwirkle!");
             System.out.println("");
             System.out.println("1 = Play local against AI or your friends");
+            System.out.println("2 = Play online against AI or your friends");
             System.out.println("");
             System.out.println("0 = Exit game");
             System.out.println("");
             choice = getInt();
-        } while (choice < 0 || choice > 1);
+        } while (choice < 0 || choice > 2);
         if (choice == 1) {
             return Client.GameType.LOCAL;
         }
-        //if (choice == 2) {
-        //    return Client.GameType.ONLINE;
-        //}
+        if (choice == 2) {
+            return Client.GameType.ONLINE;
+        }
         if (choice == 0) {
             exit();
         }
@@ -146,21 +147,44 @@ public class TextUserInterface implements IUserInterface {
 
     /**
      * Asks the user what server and port to connect to.
-     * @deprecated The TUI will not support online games anymore. The GUI will.
      * @return Returns a string array of length 2: the IP and the PORT.
      */
-    @Deprecated
     public String[] selectServer() {
         String[] server;
         do {
             clear();
             System.out.println("Please choose a server.");
             System.out.println("");
-            System.out.println("Example: 127.0.0.1:5555");
+            System.out.println("Example: localhost 5555");
             System.out.println("");
-            server = scanner.nextLine().split(":");
-        } while (server.length != 2 || !Extra.isInteger(server[1]) || Integer.parseInt(server[1]) < Server.MIN_PORT || Integer.parseInt(server[1]) > Server.MAX_PORT);
+            server = scanner.nextLine().split(" ");
+        } while (server.length != 2);
         return server;
+    }
+
+    public List<Integer> selectQueus() {
+        List<Integer> queues = new ArrayList<>();
+        do {
+            clear();
+            System.out.println("Please choose the queues.");
+            System.out.println("");
+            System.out.println("Example: 2 4");
+            System.out.println("");
+            for (String q : scanner.nextLine().split("")) {
+                int i = Integer.parseInt(q);
+                if (i >= 2 && i <= 4) queues.add(i);
+            }
+        } while (queues.size() == 0);
+        return queues;
+    }
+
+    public void drawLobby(List<String> players) {
+        clear();
+        System.out.println("Players in the server:");
+        for (String player : players) {
+            System.out.println(player);
+        }
+
     }
 
     /**

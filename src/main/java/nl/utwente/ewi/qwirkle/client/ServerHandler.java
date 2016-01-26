@@ -1,10 +1,10 @@
 package nl.utwente.ewi.qwirkle.client;
 
+import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.model.Coordinate;
 import nl.utwente.ewi.qwirkle.model.Tile;
 import nl.utwente.ewi.qwirkle.net.ClientProtocol;
 import nl.utwente.ewi.qwirkle.net.IProtocol;
-import nl.utwente.ewi.qwirkle.net.IllegalParameterException;
 import nl.utwente.ewi.qwirkle.net.ServerProtocol;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
@@ -36,12 +36,14 @@ public class ServerHandler implements Runnable {
     }};
     private List<IProtocol.Feature> features;
 
-    private ClientController controller;
+    private Client controller;
+
+    private List<String> lobby;
 
     private ClientState state;
     private boolean closed;
 
-    public ServerHandler(ClientController controller, Socket socket) throws IOException {
+    public ServerHandler(Client controller, Socket socket) throws IOException {
         this.controller = controller;
         this.socket = socket;
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -70,19 +72,16 @@ public class ServerHandler implements Runnable {
 
     public void identify(List<IProtocol.Feature> features) {
         this.features = features.stream().filter(myFeatures::contains).collect(Collectors.toList());
-        controller.showLobbyFrame();
         state = ClientState.IDENTIFIED;
     }
 
     public void queue() {
-        controller.showQueue();
         state = ClientState.QUEUED;
     }
 
     public void turn(String player) {
         if (player.equals(name)) {
             state = ClientState.GAME_TURN;
-            controller.showTurn();
         } else {
             state = ClientState.GAME_WAITING;
         }
@@ -91,24 +90,19 @@ public class ServerHandler implements Runnable {
     public void pass(String player) {
         if (player.equals(name)) {
             state = ClientState.GAME_TURN;
-            controller.showPass();
         }
     }
 
     public void movePut(Map<Coordinate, Tile> moves) {
-        controller.showMovePut(moves);
     }
 
     public void moveTrade(int amount) {
-        controller.showMoveTrade(amount);
     }
 
     public void chat(String channel, String sender, String message) {
-        controller.showChat(channel, sender, message);
     }
 
     public void error(String error) {
-        controller.showError(error);
     }
 
     public void sendQueue(List<Integer> queues) {
@@ -191,7 +185,6 @@ public class ServerHandler implements Runnable {
             case ClientProtocol.SERVER_GAMESTART:
                 List<String> players = new ArrayList<>();
                 Collections.addAll(players, args);
-                controller.startGame(players);
                 break;
             case ClientProtocol.SERVER_GAMEEND:
                 Map<String, Integer> scores = new HashMap<>();
@@ -199,7 +192,6 @@ public class ServerHandler implements Runnable {
                     String[] split = p.split(",");
                     scores.put(split[0], Integer.parseInt(split[1]));
                 }
-                controller.endGame(scores);
                 break;
             case ClientProtocol.SERVER_TURN:
                 turn(args[0]);
@@ -212,7 +204,6 @@ public class ServerHandler implements Runnable {
                 for (String t : args) {
                     tiles.add(Tile.parseTile(Integer.parseInt(t)));
                 }
-                controller.drawTiles(tiles);
                 break;
             case ClientProtocol.SERVER_MOVE_PUT:
                 Pattern p = Pattern.compile("^(\\d+)@(-?\\d+),(-?\\d+)$");
@@ -251,7 +242,7 @@ public class ServerHandler implements Runnable {
                 if (args.length > 0) {
                     Collections.addAll(players, args);
                 }
-                controller.updateLobby(players);
+                controller.ui.drawLobby(players);
                 break;
             case ClientProtocol.SERVER_ERROR:
                 error(args[0]);

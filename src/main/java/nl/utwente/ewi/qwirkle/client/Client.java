@@ -1,16 +1,17 @@
 package nl.utwente.ewi.qwirkle.client;
 
-import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.client.ui.TextUserInterface;
 import nl.utwente.ewi.qwirkle.model.Player;
 import nl.utwente.ewi.qwirkle.model.PlayerAmountInvalidException;
-import nl.utwente.ewi.qwirkle.net.ClientProtocol;
 import nl.utwente.ewi.qwirkle.server.Server;
 import nl.utwente.ewi.qwirkle.util.Extra;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
+import javax.swing.*;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.List;
 
 public class Client implements Runnable {
@@ -22,7 +23,7 @@ public class Client implements Runnable {
 
     GameController game;
 
-    IUserInterface ui;
+    TextUserInterface ui;
 
     @Override
     public void run() {
@@ -37,7 +38,7 @@ public class Client implements Runnable {
     }
 
     void loop() {
-        switch(ui.selectGameType()) {
+        switch (ui.selectGameType()) {
             case LOCAL:
                 Logger.info("Local game has been chosen.");
                 List<Player> playerList = ui.selectPlayers();
@@ -58,50 +59,72 @@ public class Client implements Runnable {
                 break;
             case ONLINE:
                 Logger.info("Online game has been chosen.");
-                String[] server;
-                Socket sock;
-                do {
-                    do {
-                        server = ui.selectServer();
-                    }
-                    while (server.length != 2 || !Extra.isInteger(server[1]) || Integer.parseInt(server[1]) < Server.MIN_PORT || Integer.parseInt(server[1]) > Server.MAX_PORT);
+                Socket socket = null;
+                while (socket == null) {
+                    String[] serverInfo = ui.selectServer();
+
+                    InetAddress host;
                     try {
-                        sock = new Socket(server[0], Integer.parseInt(server[1]));
-                        Logger.info("Connected to " + server[0] + ":" + server[1]);
-                    } catch (java.io.IOException e) {
-                        Logger.info("Can not connect to " + server[0] + ":" + server[1]);
-                        sock = null;
+                        host = InetAddress.getByName(serverInfo[0]);
+                    } catch (UnknownHostException e) {
+                        Logger.error(e);
+                        continue;
                     }
-                } while(sock == null);
+
+                    int port;
+                    try {
+                        port = Integer.parseInt(serverInfo[1]);
+                        if (port <= 0 && port > 65535) throw new NumberFormatException();
+                    } catch (NumberFormatException e) {
+                        continue;
+                    }
+
+                    try {
+                        socket = new Socket(host, port);
+                    } catch (IOException e) {
+                        Logger.error(e);
+                    }
+                }
                 Logger.info("Connection running . . .");
-                //do {
-                    Player p;
+                ServerHandler server = null;
+                try {
+                    server = new ServerHandler(this, socket);
+                    new Thread(server).start();
+                } catch (IOException e) {
+                    Logger.fatal(e);
+                    System.exit(-1);
+                }
+
+                Player p;
+                while (server.getState() != ServerHandler.ClientState.IDENTIFIED) {
                     do {
                         p = ui.selectPlayer("");
                     } while (p == null);
-                    ServerHandler sh;
+                    server.sendIdentify(p.getName());
                     try {
-                        sh = new ServerHandler(sock);
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        Logger.fatal(e);
                     }
-                //} while();
-
-                // Check op gebruikersnaam
-                // Wacht op game
-                // Start game
-
-                Logger.info("Closing connection . . .");
-                try {
-                    sock.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-                Logger.info("Connection closed.");
-                break;
+
+                while (!socket.isClosed()) {
+
+                    List<Integer> queues;
+                    while (server.getState() == ServerHandler.ClientState.IDENTIFIED) {
+                        queues = ui.selectQueus();
+                        server.sendQueue(queues);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Logger.fatal(e);
+                        }
+                    }
+                }
+
         }
     }
+
 
     public static void main(String[] args) {
         Logger.info("Starting client . . .");
