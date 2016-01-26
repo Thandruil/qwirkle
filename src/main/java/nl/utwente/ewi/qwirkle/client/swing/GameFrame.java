@@ -1,6 +1,5 @@
 package nl.utwente.ewi.qwirkle.client.swing;
 
-import nl.utwente.ewi.qwirkle.client.ClientController;
 import nl.utwente.ewi.qwirkle.model.Board;
 import nl.utwente.ewi.qwirkle.model.Tile;
 import nl.utwente.ewi.qwirkle.util.Logger;
@@ -20,8 +19,8 @@ public class GameFrame extends JFrame {
     private JButton tradeButton;
     private JButton moveButton;
 
-    private ClientController controller;
-
+    //private ClientController controller;
+    /*
     public GameFrame(ClientController controller) {
         super("Twerkle");
         this.controller = controller;
@@ -114,4 +113,5 @@ public class GameFrame extends JFrame {
         tilePane = new TilePanel();
         tileScrollPane.setViewportView(tilePane);
     }
+    */
 }

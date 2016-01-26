@@ -1,12 +1,10 @@
 package nl.utwente.ewi.qwirkle.client.swing;
 
-import nl.utwente.ewi.qwirkle.client.ClientController;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -21,8 +19,10 @@ public class ConnectDialog extends JDialog {
     private JPanel contentPane;
     private JPanel buttonPane;
 
-    private ClientController controller;
+    // private ClientController controller;
 
+
+    /*
     public ConnectDialog(ClientController controller, Frame frame) {
         super(frame, "Connect");
         this.controller = controller;
@@ -140,4 +140,5 @@ public class ConnectDialog extends JDialog {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         buttonPane.add(spacer1, gbc);
     }
+    */
 }

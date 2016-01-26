@@ -1,7 +1,5 @@
 package nl.utwente.ewi.qwirkle.client.swing;
 
-import nl.utwente.ewi.qwirkle.client.ClientController;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,8 +9,8 @@ public class MainFrame extends JFrame {
     private JButton quitButton;
     private JPanel contentPane;
 
-    private ClientController controller;
-
+    //private ClientController controller;
+    /*
     public MainFrame(ClientController controller) {
         super("Qwirkle");
         this.controller = controller;
@@ -62,4 +60,5 @@ public class MainFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         contentPane.add(internetGameButton, gbc);
     }
+    */
 }

@@ -1,7 +1,5 @@
 package nl.utwente.ewi.qwirkle.client.swing;
 
-import nl.utwente.ewi.qwirkle.client.ClientController;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -27,8 +25,9 @@ public class LobbyFrame extends JFrame {
     private JPanel inputPane;
     private JPanel controlPane;
 
-    private ClientController controller;
+    //private ClientController controller;
 
+    /*
     public LobbyFrame(ClientController controller) {
         super("Lobby");
         this.controller = controller;
@@ -217,4 +216,5 @@ public class LobbyFrame extends JFrame {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel1.add(disconnectButton, gbc);
     }
+    */
 }
