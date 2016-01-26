@@ -23,9 +23,4 @@ public class InternetPlayer extends Player {
     public Map<Coordinate, Tile> getPutMove() {
         return null;
     }
-
-    @Override
-    public String toString() {
-        return null;
-    }
 }

@@ -1,8 +1,6 @@
 package nl.utwente.ewi.qwirkle.client;
 
-import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
-import nl.utwente.ewi.qwirkle.model.Coordinate;
-import nl.utwente.ewi.qwirkle.model.Tile;
+import nl.utwente.ewi.qwirkle.model.*;
 import nl.utwente.ewi.qwirkle.net.ClientProtocol;
 import nl.utwente.ewi.qwirkle.net.IProtocol;
 import nl.utwente.ewi.qwirkle.net.ServerProtocol;
@@ -37,10 +35,18 @@ public class ServerHandler implements Runnable {
 
     private Client controller;
 
+    private GameController game;
+
+    private Player clientPlayer;
+
     private List<String> lobby;
+
+    private Player playerTurn;
 
     private ClientState state;
     private boolean closed;
+
+    private List<Tile> prevTrade;
 
     public ServerHandler(Client controller, Socket socket) throws IOException {
         this.controller = controller;
@@ -79,23 +85,39 @@ public class ServerHandler implements Runnable {
     }
 
     public void turn(String player) {
-        if (player.equals(name)) {
+        if (player.equals(clientPlayer.getName())) {
             state = ClientState.GAME_TURN;
         } else {
             state = ClientState.GAME_WAITING;
+        }
+        game.getPlayers().stream().filter(p -> p.getName().equals(player)).forEach(p -> playerTurn = p);
+        game.setCurrentPlayer(playerTurn);
+        if (playerTurn.getName().equals(clientPlayer.getName())) {
+            if (game.getBoardCopy().isPutPossible(playerTurn.getHand()) && playerTurn.getMoveType() == Board.MoveType.PUT) {
+                sendMovePut(playerTurn.getPutMove());
+            } else {
+                prevTrade = playerTurn.getTradeMove();
+                sendMoveTrade(prevTrade);
+            }
         }
     }
 
     public void pass(String player) {
         if (player.equals(name)) {
-            state = ClientState.GAME_TURN;
+            game.getUI().message("You had to pass your turn.");
+        } else {
+            game.getUI().message(player + " had to pass a turn.");
         }
     }
 
     public void movePut(Map<Coordinate, Tile> moves) {
+        for (Coordinate c : moves.keySet()) {
+            game.put(c, moves.get(c));
+        }
     }
 
     public void moveTrade(int amount) {
+        game.getUI().message(playerTurn.getName() + " traded " + amount + " tiles!");
     }
 
     public void chat(String channel, String sender, String message) {
@@ -160,7 +182,7 @@ public class ServerHandler implements Runnable {
         }
     }
 
-    private void parsePacket(String message) {
+    private synchronized void parsePacket(String message) {
         String[] packetWords = message.split(" ");
         String command = packetWords[0];
         String[] args = new String[packetWords.length - 1];
@@ -182,15 +204,52 @@ public class ServerHandler implements Runnable {
                 queue();
                 break;
             case ClientProtocol.SERVER_GAMESTART:
-                List<String> players = new ArrayList<>();
-                Collections.addAll(players, args);
+                List<String> names = new ArrayList<>();
+                Collections.addAll(names, args);
+                List<Player> players = new ArrayList<>();
+                for (String name : names) {
+                    if (name.equals(clientPlayer.getName())) {
+                        players.add(clientPlayer);
+                    } else {
+                        players.add(new InternetPlayer(name));
+                    }
+                }
+                try {
+                    game = new GameController(controller.ui, players);
+                    for (Player p : players) {
+                        p.setGameController(game);
+                        for (int i = 1; i <= Deck.HAND_SIZE; i++) {
+                            try {
+                                game.getDeck().drawTile();
+                            } catch (EmptyDeckException e) {
+                                Logger.fatal("Could not remove Tiles from the deck.");
+                            }
+                        }
+                    }
+                    game.getUI().initGame(game);
+                } catch (PlayerAmountInvalidException e) {
+                    Logger.fatal("Can not start the game, player amount is invalid.", e);
+                }
                 break;
             case ClientProtocol.SERVER_GAMEEND:
+                String[] args2 = new String[args.length - 1];
+                System.arraycopy(args, 1, args2, 0, args.length - 1);
                 Map<String, Integer> scores = new HashMap<>();
-                for (String p : args) {
+                for (String p : args2) {
                     String[] split = p.split(",");
                     scores.put(split[0], Integer.parseInt(split[1]));
+                    for (Player pl : this.game.getPlayers()) {
+                        if (pl.getName().equals(split[0])) {
+                            pl.setScore(Integer.parseInt(split[1]));
+                        }
+                    }
                 }
+                this.game.getUI().gameOver();
+                for (Player p : game.getPlayers()) {
+                    clientPlayer.setScore(0);
+                    clientPlayer.emptyHand();
+                }
+                state = ClientState.IDENTIFIED;
                 break;
             case ClientProtocol.SERVER_TURN:
                 turn(args[0]);
@@ -201,7 +260,7 @@ public class ServerHandler implements Runnable {
             case ClientProtocol.SERVER_DRAWTILE:
                 List<Tile> tiles = new ArrayList<>();
                 for (String t : args) {
-                    tiles.add(Tile.parseTile(Integer.parseInt(t)));
+                    clientPlayer.addTile(Tile.parseTile(Integer.parseInt(t)));
                 }
                 break;
             case ClientProtocol.SERVER_MOVE_PUT:
@@ -215,14 +274,41 @@ public class ServerHandler implements Runnable {
                             int x = Integer.parseInt(matcher.group(2));
                             int y = Integer.parseInt(matcher.group(3));
                             moves.put(new Coordinate(x, y), Tile.parseTile(t));
+                            for (Coordinate c : moves.keySet()) {
+                                try {
+                                    game.getDeck().drawTile();
+                                } catch (EmptyDeckException e) {
+                                    Logger.fatal("Could not remove Tiles from the deck.");
+                                }
+                            }
                         } catch (NumberFormatException e) {
                             Logger.fatal(e);
                         }
                     }
                 }
                 movePut(moves);
+                playerTurn.addScore(game.getBoardCopy().getScore(moves));
+                if (playerTurn.getName().equals(clientPlayer.getName())) {
+                    try {
+                        playerTurn.removeTile(new ArrayList<>(moves.values()));
+                    } catch (TileDoesNotExistException e) {
+                        Logger.fatal("Removing tile but it was not in the players hand!");
+                    }
+                }
                 break;
             case ClientProtocol.SERVER_MOVE_TRADE:
+                if (playerTurn.getName().equals(clientPlayer.getName())) {
+                    if (prevTrade.size() == Integer.parseInt(args[0])) {
+                        try {
+                            playerTurn.removeTile(prevTrade);
+                        } catch (TileDoesNotExistException e) {
+                            Logger.fatal("The tile is not in the player's hand!");
+                        }
+                        prevTrade = null;
+                    } else {
+                        Logger.fatal("The trade size does not match!");
+                    }
+                }
                 moveTrade(Integer.parseInt(args[0]));
                 break;
             case ClientProtocol.SERVER_CHAT:
@@ -237,11 +323,11 @@ public class ServerHandler implements Runnable {
             case ClientProtocol.SERVER_LEADERBOARD:
                 break;
             case ClientProtocol.SERVER_LOBBY:
-                players = new ArrayList<>();
+                names = new ArrayList<>();
                 if (args.length > 0) {
-                    Collections.addAll(players, args);
+                    Collections.addAll(names, args);
                 }
-                controller.ui.drawLobby(players);
+                controller.ui.drawLobby(names);
                 break;
             case ClientProtocol.SERVER_ERROR:
                 error(args[0]);
@@ -254,4 +340,6 @@ public class ServerHandler implements Runnable {
     public ClientState getState() {
         return this.state;
     }
+
+    public void setClientPlayer(Player p) { clientPlayer = p; }
 }

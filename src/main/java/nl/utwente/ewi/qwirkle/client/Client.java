@@ -90,7 +90,7 @@ public class Client implements Runnable {
                     int port;
                     try {
                         port = Integer.parseInt(serverInfo[1]);
-                        if (port <= 0 && port > 65535) throw new NumberFormatException();
+                        if (port < Server.MIN_PORT && port > Server.MAX_PORT) throw new NumberFormatException();
                     } catch (NumberFormatException e) {
                         continue;
                     }
@@ -117,6 +117,7 @@ public class Client implements Runnable {
                         p = ui.selectPlayer("");
                     } while (p == null);
                     server.sendIdentify(p.getName());
+                    server.setClientPlayer(p);
                     try {
                         Thread.sleep(1000);
                     } catch (InterruptedException e) {
@@ -130,6 +131,23 @@ public class Client implements Runnable {
                     while (server.getState() == ServerHandler.ClientState.IDENTIFIED) {
                         queues = ui.selectQueus();
                         server.sendQueue(queues);
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Logger.fatal(e);
+                        }
+                    }
+
+                    while (server.getState() == ServerHandler.ClientState.QUEUED) {
+                        ui.message("Looking for a game . . .");
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            Logger.fatal(e);
+                        }
+                    }
+
+                    while (server.getState() == ServerHandler.ClientState.GAME_TURN || server.getState() == ServerHandler.ClientState.GAME_WAITING) {
                         try {
                             Thread.sleep(1000);
                         } catch (InterruptedException e) {

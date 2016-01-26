@@ -81,6 +81,12 @@ public abstract class Player {
     }
 
     /**
+     * Sets the score of the Player.
+     * @param score The score to be set.
+     */
+    public void setScore(int score) { this.score = score; }
+
+    /**
      * Returns the List of tiles in the Player's hand.
      * @return The Player's hand.
      */

@@ -174,11 +174,17 @@ public class TextUserInterface implements IUserInterface {
             System.out.println("Example: 2 4");
             System.out.println("");
             for (String q : scanner.nextLine().split("")) {
-                int i = Integer.parseInt(q);
-                if (i >= 2 && i <= 4) queues.add(i);
+                if (Extra.isInteger(q)) {
+                    int i = Integer.parseInt(q);
+                    if (i >= 2 && i <= 4) queues.add(i);
+                }
             }
         } while (queues.size() == 0);
         return queues;
+    }
+
+    public void message(String m) {
+        System.out.println(m);
     }
 
     public void drawLobby(List<String> players) {

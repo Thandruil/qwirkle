@@ -1,5 +1,6 @@
 package nl.utwente.ewi.qwirkle.client;
 
+import nl.utwente.ewi.qwirkle.client.ui.IUserInterface;
 import nl.utwente.ewi.qwirkle.client.ui.TextUserInterface;
 import nl.utwente.ewi.qwirkle.model.*;
 import nl.utwente.ewi.qwirkle.util.Logger;
@@ -121,7 +122,7 @@ public class GameController {
             }
             nextPlayer();
         }
-        //ui.gameOver();
+        ui.gameOver();
     }
 
     /**
@@ -248,6 +249,10 @@ public class GameController {
         return this.playerList.get(this.playerTurn);
     }
 
+    public void setCurrentPlayer(Player p) {
+        playerTurn = playerList.indexOf(p);
+    }
+
     /**
      * Get the list of players taking part in the game.
      * @return The list of players taking part in the game.
@@ -259,5 +264,11 @@ public class GameController {
      * @return The amount of tiles remaining in the deck.s
      */
     public int getDeckRemaining() { return this.deck.remaining(); }
+
+    public TextUserInterface getUI() { return ui; }
+
+    public void put(Coordinate c, Tile t) { board.put(c, t); }
+
+    public Deck getDeck() { return deck; }
 
 }

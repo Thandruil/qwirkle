@@ -237,19 +237,45 @@ public class Game {
      * Passes the turn to the next Player and checks if the player can have a turn or has to pass.
      */
     public void next() {
-        turn = (turn + 1) % players.size();
 
-        Player player = getCurrentPlayer();
-        boolean canPut = board.isPutPossible(player.getHand());
-        int tradeAmount = Math.min(player.getHand().size(), deck.remaining());
-        if (board.isEmpty()) tradeAmount = 0;
-
-        if (tradeAmount == 0 && !canPut) {
-            sendPass();
+        if (isEnded()) {
+            end(true);
         } else {
-            sendTurn();
+            turn = (turn + 1) % players.size();
+
+            Player player = getCurrentPlayer();
+            boolean canPut = board.isPutPossible(player.getHand());
+            int tradeAmount = Math.min(player.getHand().size(), deck.remaining());
+            if (board.isEmpty()) tradeAmount = 0;
+
+            if (tradeAmount == 0 && !canPut) {
+                sendPass();
+                next();
+            } else {
+                sendTurn();
+            }
         }
     }
+
+    private boolean isEnded() {
+        if (getCurrentPlayer().getHand().size() <= 0) {
+            return true;
+        }
+        if (getDeckRemaining() <= 0) {
+            boolean checker = true;
+            for (Player p : getPlayers().values()) {
+                if (this.board.isPutPossible(p.getHand())) {
+                    checker = false;
+                }
+            }
+            if (checker) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public int getDeckRemaining() { return this.deck.remaining(); }
 
     /**
      * Returns if the Board of this Game is empty.

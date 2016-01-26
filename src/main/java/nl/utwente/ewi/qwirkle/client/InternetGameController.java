@@ -7,7 +7,7 @@ import nl.utwente.ewi.qwirkle.util.Logger;
 import java.util.*;
 
 public class InternetGameController {
-    private OldClientController controller;
+    //private OldClientController controller;
 
     private Board board;
     private Player localPlayer;
@@ -34,7 +34,7 @@ public class InternetGameController {
 
     public void removeTiles(Collection<Tile> tiles) {
         try {
-            localPlayer.removeTile(new ArrayList<Tile>(tiles));
+            localPlayer.removeTile(new ArrayList<>(tiles));
         } catch (TileDoesNotExistException e) {
             Logger.fatal(e);
         }

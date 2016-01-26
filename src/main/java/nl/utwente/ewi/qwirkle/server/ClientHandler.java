@@ -258,7 +258,7 @@ public class ClientHandler implements Runnable {
         if (player.equals(name)) {
             Logger.info(String.format("Player %s skipped", getName()));
         }
-        writePacket(ServerProtocol.turn(player));
+        writePacket(ServerProtocol.pass(player));
     }
 
     /**

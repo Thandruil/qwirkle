@@ -49,6 +49,7 @@ public class Board extends Observable {
     public void put(Coordinate c, Tile tile) {
         map.put(c, tile);
         setChanged();
+        notifyObservers();
     }
 
     /**
@@ -59,6 +60,7 @@ public class Board extends Observable {
     public void remove(Coordinate c) {
         map.remove(c);
         setChanged();
+        notifyObservers();
     }
 
     /**
