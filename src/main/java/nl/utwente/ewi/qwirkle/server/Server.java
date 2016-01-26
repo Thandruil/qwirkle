@@ -1,10 +1,10 @@
 package nl.utwente.ewi.qwirkle.server;
 
-import nl.utwente.ewi.qwirkle.server.ui.ChoosePort;
-import nl.utwente.ewi.qwirkle.server.ui.ServerUserInterface;
 import nl.utwente.ewi.qwirkle.server.model.PlayerList;
+import nl.utwente.ewi.qwirkle.server.ui.ServerUserInterface;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -63,14 +63,15 @@ public class Server implements Runnable {
      */
     void init() {
         while (server == null) {
-            ChoosePort cp;
+            int port = 0;
             do {
-                cp = new ChoosePort();
-                if (!cp.getEnter()) {
-                    System.exit(0);
+                String message = JOptionPane.showInputDialog("Please enter a port to listen on");
+                try {
+                    port = Integer.parseInt(message);
+                } catch (NumberFormatException e) {
+                    port = 0;
                 }
-            } while(cp.getPort() < MIN_PORT || cp.getPort() > MAX_PORT);
-            port = cp.getPort();
+            } while(port < MIN_PORT || port > MAX_PORT);
             ui = new ServerUserInterface();
             try {
                 Logger.info(String.format("Starting Qwirkle server on *:%d", port));
