@@ -46,6 +46,7 @@ public class GameFrame extends JFrame {
 
     public void updateBoard(Board board) {
         tilePane.update(board);
+        this.repaint();
     }
 
     private void setupUI() {
