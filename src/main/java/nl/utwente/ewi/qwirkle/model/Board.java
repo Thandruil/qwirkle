@@ -38,6 +38,8 @@ public class Board extends Observable {
      * @param c Coordinale
      * @return the Tile at the coordinates
      */
+    //@ requires c != null;
+    //@ pure;
     public Tile get(Coordinate c) {
         return map.get(c);
     }
@@ -48,6 +50,9 @@ public class Board extends Observable {
      * @param c Coordinate
      * @param tile the Tile to be placed
      */
+    //@ requires c != null;
+    //@ requires tile != null;
+    //@ modifies map;
     public void put(Coordinate c, Tile tile) {
         map.put(c, tile);
         setChanged();
@@ -59,6 +64,8 @@ public class Board extends Observable {
      *
      * @param c Coordinate
      */
+    //@ requires c != null;
+    //@ modifies map;
     public void remove(Coordinate c) {
         map.remove(c);
         setChanged();
@@ -70,6 +77,11 @@ public class Board extends Observable {
      *
      * @return the boundaries in form [top, right, bottom, left]
      */
+    //@ ensures \result[0] >= 0;
+    //@ ensures \result[1] >= 0;
+    //@ ensures \result[2] <= 0;
+    //@ ensures \result[3] <= 0;
+    //@ pure;
     public int[] getBoundaries() {
         int[] boundaries = new int[4];
         for (Coordinate c : map.keySet()) {
@@ -85,6 +97,7 @@ public class Board extends Observable {
      * Checks if the Board is empty.
      * @return If the Board is empty.
      */
+    //@ pure;
     public boolean isEmpty() {
         return (this.map.keySet().size() == 0);
     }
@@ -128,6 +141,7 @@ public class Board extends Observable {
      * @param move A set of PlacedTiles indicating the move.
      * @return The score that should be awarded to a player for the given move.
      */
+    //@ modifies map;
     public int doMove(Map<Coordinate, Tile> move) {
         if (validateMove(move)) {
             int score = getScore(move);
@@ -146,6 +160,7 @@ public class Board extends Observable {
      * @param move The move of which the score should be calculated.
      * @return The calculated score.
      */
+    //@ pure;
     public int getScore(Map<Coordinate, Tile> move) {
         int score = 0;
         boolean horizontal = isHorizontal(move);
@@ -218,6 +233,7 @@ public class Board extends Observable {
      * @param move The move that should be checked.
      * @return If the move is valid.
      */
+    //@ pure;
     public boolean validateMove(Map<Coordinate, Tile> move) {
         if (move == null || move.size() <= 0 || move.size() > Deck.QWIRKLE_SIZE) {
             return false; // Amount of placedTiles is not valid
@@ -322,6 +338,7 @@ public class Board extends Observable {
      * @param move The move that should be checked.
      * @return If the tiles are on a vertical line.
      */
+    //@ pure;
     private boolean isVertical(Map<Coordinate, Tile> move) {
         int currentX = 0;
         boolean first = true;
@@ -343,6 +360,7 @@ public class Board extends Observable {
      * @param move The move that should be checked.
      * @return If the tiles are on a horizontal line.
      */
+    //@ pure;
     private boolean isHorizontal(Map<Coordinate, Tile> move) {
         int currentY = 0;
         boolean first = true;
@@ -392,6 +410,7 @@ public class Board extends Observable {
      * Check whether all tiles are connected using the DFS algorithm.
      * @return
      */
+    //@ pure;
     private boolean checkNoGaps() {
         Set<Coordinate> visited = new HashSet<>();
         dfs(new Coordinate(0, 0), visited);
@@ -403,6 +422,7 @@ public class Board extends Observable {
      * @param c
      * @param visited
      */
+    //@ pure;
     private void dfs(Coordinate c, Set<Coordinate> visited) {
         visited.add(c);
         Coordinate top = new Coordinate(c.getX(), c.getY() + 1);
@@ -474,6 +494,7 @@ public class Board extends Observable {
      * @param hand The hand that should be checked upon.
      * @return If a put is possible.
      */
+    //@ pure;
     public boolean isPutPossible(List<Tile> hand) {
         for (Tile t : hand) {
             int[] boundaries = getBoundaries();
