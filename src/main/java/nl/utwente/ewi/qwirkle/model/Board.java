@@ -1,5 +1,7 @@
 package nl.utwente.ewi.qwirkle.model;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+
 import java.util.*;
 
 /**
@@ -232,7 +234,7 @@ public class Board extends Observable {
                 }
                 tmpBoard.put(c, move.get(c));
             }
-            if (!tmpBoard.checkAllAdjacent()) {
+            if (!tmpBoard.checkNoGaps()) {
                 return false;
             }
 
@@ -386,8 +388,31 @@ public class Board extends Observable {
         return checkNoGaps();
     }
 
+    /**
+     * Check whether all tiles are connected using the DFS algorithm.
+     * @return
+     */
     private boolean checkNoGaps() {
-        return true;
+        Set<Coordinate> visited = new HashSet<>();
+        dfs(new Coordinate(0, 0), visited);
+        return map.size() == visited.size();
+    }
+
+    /**
+     * Performs a depth-first search.
+     * @param c
+     * @param visited
+     */
+    private void dfs(Coordinate c, Set<Coordinate> visited) {
+        visited.add(c);
+        Coordinate top = new Coordinate(c.getX(), c.getY() + 1);
+        Coordinate right = new Coordinate(c.getX() + 1, c.getY());
+        Coordinate bottom = new Coordinate(c.getX(), c.getY() - 1);
+        Coordinate left = new Coordinate(c.getX() - 1, c.getY());
+        if (map.get(top) != null && !visited.contains(top)) dfs(top, visited);
+        if (map.get(right) != null && !visited.contains(right)) dfs(right, visited);
+        if (map.get(bottom) != null && !visited.contains(bottom)) dfs(bottom, visited);
+        if (map.get(left) != null && !visited.contains(left)) dfs(left, visited);
     }
 
     /**
