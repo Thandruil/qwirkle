@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 import java.util.List;
 
 /**
- * Controlls all the actions of the client and the User Interface.
+ * Controls all the actions of the client and the User Interface.
  */
 public class Client implements Runnable {
 

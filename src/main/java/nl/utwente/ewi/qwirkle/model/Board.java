@@ -383,6 +383,10 @@ public class Board extends Observable {
                 return false;
             }
         }
+        return checkNoGaps();
+    }
+
+    private boolean checkNoGaps() {
         return true;
     }
 

@@ -34,7 +34,7 @@ public class ServerProtocol implements IProtocol {
     }
 
     public static String gameEnd(Map<String, Integer> playerScores, boolean win) {
-        return String.format("%s %s %s", IProtocol.SERVER_GAMEEND, win ? "WIN" : "ERROR" , playerScores.keySet().stream().map(p -> p + "," + playerScores.get(p)).collect(Collectors.joining(" ")));
+        return String.format("%s %s %s", IProtocol.SERVER_GAMEEND, win ? "WIN" : "ERROR" , playerScores.keySet().stream().map(p -> playerScores.get(p) + "," + p).collect(Collectors.joining(" ")));
     }
 
     public static String turn(String player) {

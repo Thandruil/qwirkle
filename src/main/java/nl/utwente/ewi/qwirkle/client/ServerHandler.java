@@ -93,7 +93,7 @@ public class ServerHandler implements Runnable {
         game.getPlayers().stream().filter(p -> p.getName().equals(player)).forEach(p -> playerTurn = p);
         game.setCurrentPlayer(playerTurn);
         if (playerTurn.getName().equals(clientPlayer.getName())) {
-            if (game.getBoardCopy().isPutPossible(playerTurn.getHand()) && playerTurn.getMoveType() == Board.MoveType.PUT) {
+            if (game.getBoardCopy().isPutPossible(playerTurn.getHand()) && (game.getBoardCopy().isEmpty() || playerTurn.getMoveType() == Board.MoveType.PUT)) {
                 sendMovePut(playerTurn.getPutMove());
             } else {
                 prevTrade = playerTurn.getTradeMove();
@@ -240,10 +240,10 @@ public class ServerHandler implements Runnable {
                 Map<String, Integer> scores = new HashMap<>();
                 for (String p : args2) {
                     String[] split = p.split(",");
-                    scores.put(split[0], Integer.parseInt(split[1]));
+                    scores.put(split[1], Integer.parseInt(split[0]));
                     for (Player pl : this.game.getPlayers()) {
-                        if (pl.getName().equals(split[0])) {
-                            pl.setScore(Integer.parseInt(split[1]));
+                        if (pl.getName().equals(split[1])) {
+                            pl.setScore(Integer.parseInt(split[0]));
                         }
                     }
                 }

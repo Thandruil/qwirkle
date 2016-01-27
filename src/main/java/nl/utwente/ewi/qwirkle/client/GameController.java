@@ -265,10 +265,23 @@ public class GameController {
      */
     public int getDeckRemaining() { return this.deck.remaining(); }
 
+    /**
+     * Returns the current User Interface.
+     * @return The current User Interface.
+     */
     public TextUserInterface getUI() { return ui; }
 
+    /**
+     * Puts a tile on the board without further checking. This is used for being a slave of the server, according to the Protocol.
+     * @param c The Coordinate to put the Tile on.
+     * @param t The Tile to put on the Board.
+     */
     public void put(Coordinate c, Tile t) { board.put(c, t); }
 
+    /**
+     * Returns the Deck of the current game.
+     * @return The Deck of the current game.
+     */
     public Deck getDeck() { return deck; }
 
 }

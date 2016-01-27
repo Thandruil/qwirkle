@@ -1,6 +1,7 @@
 package nl.utwente.ewi.qwirkle.model;
 
 import nl.utwente.ewi.qwirkle.client.GameController;
+import nl.utwente.ewi.qwirkle.net.IProtocol;
 
 import java.util.*;
 
@@ -13,9 +14,6 @@ public abstract class Player {
      * Holds the GameController controlling the game.
      */
     private GameController gc;
-
-    // TODO: 22-1-16 REPLACE THIS WITH THE ONE IN IPROTOCOL
-    public final static String NAME_REGEX = "^[A-Za-z0-9_-]{2,16}$";
 
     /**
      * Holds the name of the Player.
@@ -49,7 +47,7 @@ public abstract class Player {
      * @throws PlayerNameInvalidException Thrown when the given name does not meet the requirements.
      */
     public void setName(String name) throws PlayerNameInvalidException {
-        if (name.matches(NAME_REGEX)) {
+        if (name.matches(IProtocol.NAME_REGEX)) {
             this.name = name;
         } else {
             throw new PlayerNameInvalidException("The name " + name + " is invalid.");

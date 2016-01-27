@@ -3,7 +3,7 @@ package nl.utwente.ewi.qwirkle.client.ui;
 import nl.utwente.ewi.qwirkle.client.Client;
 import nl.utwente.ewi.qwirkle.client.GameController;
 import nl.utwente.ewi.qwirkle.model.*;
-import nl.utwente.ewi.qwirkle.server.Server;
+import nl.utwente.ewi.qwirkle.net.IProtocol;
 import nl.utwente.ewi.qwirkle.util.Extra;
 import nl.utwente.ewi.qwirkle.util.Logger;
 
@@ -131,7 +131,7 @@ public class TextUserInterface implements IUserInterface {
             System.out.println("Please choose a name.");
             System.out.println("");
             name = scanner.nextLine();
-        } while (!name.matches(Player.NAME_REGEX));
+        } while (!name.matches(IProtocol.NAME_REGEX));
         try {
             switch(type) {
                 case 1:
@@ -165,6 +165,10 @@ public class TextUserInterface implements IUserInterface {
         return server;
     }
 
+    /**
+     * Asks the user what queues it wants to join.
+     * @return The list of queue lengths the user wants to join.
+     */
     public List<Integer> selectQueus() {
         List<Integer> queues = new ArrayList<>();
         do {
@@ -183,10 +187,18 @@ public class TextUserInterface implements IUserInterface {
         return queues;
     }
 
+    /**
+     * Puts a message on the screen.
+     * @param m The message to be put on the screen.
+     */
     public void message(String m) {
         System.out.println(m);
     }
 
+    /**
+     * Puts the lobby on the screen.
+     * @param players The players in the lobby.
+     */
     public void drawLobby(List<String> players) {
         clear();
         System.out.println("Players in the server:");
@@ -398,6 +410,9 @@ public class TextUserInterface implements IUserInterface {
         update();
     }
 
+    /**
+     * Updates the board.
+     */
     public void update() {
         clear();
         drawBoard(game.getCurrentPlayer());
